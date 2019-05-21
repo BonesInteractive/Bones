@@ -1,0 +1,28 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class AIDestinationChange : MonoBehaviour
+{
+    //This is for Random AI Movement
+
+    public int xPos;
+    public int zPos;
+
+    void OnTriggerEnter(Collider other)
+    {
+        //the double equal is not stating, we are asking for the tag
+        if(other.tag == "Player")
+        {
+            //Randomizing location of AI
+            xPos = Random.Range(270, 380);
+            zPos = Random.Range(140, 215);
+            //Lets declare how we actually move it
+            this.gameObject.transform.position = new Vector3(xPos, 1.5f, zPos);
+        }
+    }
+
+
+
+
+}

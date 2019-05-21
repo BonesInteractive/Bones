@@ -1,0 +1,45 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class SwitchMusicTrigger : MonoBehaviour
+{
+
+    private AudioSource audioSource;
+
+    public AudioClip newTrack;
+    //public AudioClip TowerTune;
+
+    //public AudioClip basementMusic;
+
+    private AudioManager theAM;
+
+    // Start is called before the first frame update
+    void Start()
+    {
+        //audioSource = GetComponent<AudioSource>();
+        theAM = FindObjectOfType<AudioManager>();
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        
+    }
+
+    void OnTriggerEnter(Collider other)
+    {
+        if(other.tag == "Player")
+        {
+            if(newTrack != null)
+                theAM.ChangeBGM(newTrack);
+
+            //audioSource.PlayOneShot(TowerTune, 1);
+
+            //BoilerRoomMusic.clip = basementMusic;
+           //BoilerRoomMusic.Play();
+           //AudioSource.PlayOneShot(Atmospheric)
+
+        }
+    }
+}

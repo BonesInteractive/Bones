@@ -1,0 +1,28 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class Cutscene_Stopper : MonoBehaviour
+{
+
+    public GameObject ThePlayer;
+    public GameObject my_script;
+
+    public string stopThirdPersonUserControlScript; // your second script, stop this script (stop player)
+
+
+    void Start()
+    {
+        (my_script.GetComponent(stopThirdPersonUserControlScript) as MonoBehaviour).enabled = false;
+        StartCoroutine(StopPlayer());
+
+    }
+
+    IEnumerator StopPlayer ()
+    {
+        yield return new WaitForSeconds(20f);
+        (my_script.GetComponent(stopThirdPersonUserControlScript) as MonoBehaviour).enabled = true;
+        yield return null;
+    }
+
+}

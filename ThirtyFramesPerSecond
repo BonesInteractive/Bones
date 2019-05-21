@@ -1,0 +1,28 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class ThirtyFramesPerSecondForce : MonoBehaviour
+{
+
+    public int target = 30;
+   
+    void Awake()
+    {
+
+        QualitySettings.vSyncCount = 0;
+
+        //Make the game run as fast as possible
+        Application.targetFrameRate = 30;
+
+    }
+
+    void Update()
+    {
+        if(target != Application.targetFrameRate)
+        {
+
+            Application.targetFrameRate = target;
+        }
+    }
+}

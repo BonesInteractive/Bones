@@ -1,0 +1,21 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class PlayerHitReaction : MonoBehaviour
+{
+    public GameObject player3;
+    public bool enterHit;
+    //public bool exit;
+
+    void OnTriggerEnter(Collider other)
+    {
+        if (other.tag == "Player")
+        {
+            if (enterHit)
+            {
+                player3.GetComponent<Animator>().Play("HitReaction");
+            }
+        }
+    }
+}

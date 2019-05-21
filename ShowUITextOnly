@@ -1,0 +1,36 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+
+public class ShowUI_TextOnly : MonoBehaviour
+{
+
+    public GameObject textOnly;
+
+    public float time = 5; //Seconds to read the text
+
+    void Start()
+    {
+        textOnly.SetActive(false);
+    }
+
+    void OnTriggerStay(Collider other)
+    {
+        if (other.tag == "Player" && Input.GetKeyDown("space") | Input.GetKeyDown("joystick button 1"))
+        {
+
+            textOnly.SetActive(true);
+
+        }
+    }
+
+    void OnTriggerExit(Collider other)
+    {
+        if (other.tag == "Player")
+        {
+            textOnly.SetActive(false);
+           
+        }
+    }
+}

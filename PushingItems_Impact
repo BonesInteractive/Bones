@@ -1,0 +1,22 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class ImpactSound : MonoBehaviour
+{
+
+    public AudioSource impactSound;
+
+    public GameObject player;
+
+    void OnCollisionEnter(Collision collision)
+    {
+        if(collision.relativeVelocity.magnitude > 1) //this is checking how far this is falling
+        {
+            impactSound.Play();
+            player.GetComponent<Animator>().Play("Push");
+
+        }
+    }
+
+}

@@ -1,0 +1,35 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+
+public class PauseGame : MonoBehaviour
+{
+    public Canvas pauseMenu;
+
+    public bool paused;
+    public KeyCode pauseKey;
+    public bool canPause;
+
+    public void Start()
+    {
+        pauseMenu.enabled = false;
+    }
+
+    public void Update()
+    {
+        if(Input.GetKeyDown (pauseKey) && !paused && canPause || Input.GetKeyDown("joystick button 9"))
+        {
+            pauseMenu.enabled = true;
+            paused = true;
+            Time.timeScale = 0; //stops time
+        }
+        else if (Input.GetKeyDown(pauseKey) && paused || Input.GetKeyDown("joystick button 9"))
+        {
+            pauseMenu.enabled = false;
+            paused = false;
+            Time.timeScale = 1; //its going to keep all scripts running
+
+        }
+    }
+}

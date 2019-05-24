@@ -1,3 +1,4 @@
+
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -18,6 +19,9 @@ public class flashlightToggle : MonoBehaviour
     public AudioClip batteryPickUpSound;  //assign audio clip
 
     public float _batteryBarLength;       //defines battery bar length
+
+    public float _maxFlickerSpeed = 1f;         //defines are max light flicker speed
+    public float _minFlickerSpeed = 0.1f;       //defines are min light flicker speed
 
     void Start()
     {
@@ -40,22 +44,57 @@ public class flashlightToggle : MonoBehaviour
             flashlightOff.enabled = !flashlightOff.enabled;
         }
 
-        if(currentbatteryPower > maximumBatteryPower)    //if current battery power is greater than max power
+        if(currentbatteryPower > maximumBatteryPower)       //if current battery power is greater than max power
         {
-            currentbatteryPower = maximumBatteryPower;    //then make current power to max power
+            currentbatteryPower = maximumBatteryPower;      //then make current power to max power
         }
-        if(currentbatteryPower < 0)                      //if cur power is less than zero
+        if(currentbatteryPower < 0)                         //if cur power is less than zero
         {
-            currentbatteryPower = 0;                     //then make current power equal to zero
-            flashlightSource2.enabled = false;           //you guessed it, main light source turns off
-            flashlightOff.enabled = false;              //back light turns off
+            currentbatteryPower = 0;                        //then make current power equal to zero
+            flashlightSource2.enabled = false;              //you guessed it, main light source turns off
+            flashlightOff.enabled = false;                  //back light turns off
         }
 
-        if (flashlightSource2.enabled)                   //if the flashlight is enabled
+
+        if(currentbatteryPower < 10)                        //if current battery power is less than 10
+        {
+            StartCoroutine("FlashlightModifier");           //then will start flashlight modifier function to flickering
+        }
+
+        if (currentbatteryPower > 10)                       //if current battery power is greater than 10
+        {
+            StopCoroutine("FlashlightModifier");            //then will stop flashlight modifier function to flickering
+        }
+
+        if(currentbatteryPower == 0)
+        {
+            StopCoroutine("FlashlightModifier");            ////then will stop flashlight modifier function
+            flashlightSource2.enabled = false;              //and disables the flashlight
+            flashlightOff.enabled = false;                  //and disables the back light
+            return;                                         //return because 
+        }
+
+
+        if (flashlightSource2.enabled)                                        //if the flashlight is enabled
         {
             currentbatteryPower -= _lowDrainBatterySpeed * Time.deltaTime;    //then minus our low drain speed from our current power
         }
     }
+
+
+    IEnumerator FlashlightModifier()
+    {
+        flashlightSource2.enabled = true;                                    //enable flashlight
+        flashlightOff.enabled = true;                                        //enable flashlight
+        yield return new WaitForSeconds                                      //between
+            (Random.Range(_minFlickerSpeed, _maxFlickerSpeed));              //the min flicker speed and max
+
+        flashlightSource2.enabled = false;                                    //disable flashlight
+        flashlightOff.enabled = false;                                       //disable flashlight
+        yield return new WaitForSeconds                                      //between
+            (Random.Range(_minFlickerSpeed, _maxFlickerSpeed));              //the min flicker speed and max
+    }
+
 
     public void AddBattery(int _batteryPowerAmount)
     {
@@ -75,6 +114,9 @@ public class flashlightToggle : MonoBehaviour
     }
 
 }
+        
+
+
         
 
 

@@ -1,0 +1,275 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class Weapons : MonoBehaviour
+{
+    //this is the basic skeleton in place for weapons, includes switch between weapons and enabling and disabling weapon models
+
+
+    private int _pistolAmmoTemp;       //defines amount of ammo stored temporary
+    private int _shotgunAmmoTemp;      //defines amount of ammo stored temporary
+    private int _machinegunlAmmoTemp;  //defines amount of ammo stored temporary
+    private int _riflelAmmoTemp;       //defines amount of ammo stored temporary
+
+    private WeaponState _weaponState;  //defines naming convention of the weapon states
+
+    private enum WeaponState           //Defines states weapons can exist in
+    {
+        Unequipped,
+        Pistol,
+    //    Shotgun,
+    //    MachineGun,
+    //    Rifle
+    }
+
+
+
+    // Start is called before the first frame update
+    void Start()
+    {
+        StartCoroutine("WeaponStateFSM");     //Call WeaponStateFSM function
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        if (Input.GetButtonDown("Unequipped"))       //if input equals the Unequipped key
+            _weaponState = Weapons.WeaponState.Unequipped;     //then change state to Unequipped
+
+        if(Input.GetKeyDown("c"))                               //if input equals key "1"
+            _weaponState = Weapons.WeaponState.Pistol;      //then change state to Pistol
+
+        //if (Input.GetKeyDown("2"))                               //if input equals key "2"
+        //    _weaponState = Weapons.WeaponState.Shotgun;      //then change state to Pistol
+
+        //if (Input.GetKeyDown("3"))                               //if input equals key "3"
+        //    _weaponState = Weapons.WeaponState.MachineGun;      //then change state to Pistol
+
+        //if (Input.GetKeyDown("4"))                               //if input equals key "4"
+            //_weaponState = Weapons.WeaponState.Rifle;      //then change state to Pistol
+    }
+
+    private IEnumerator WeaponStateFSM()
+    {
+        while (true)
+        {
+            switch (_weaponState)
+            {
+                case WeaponState.Unequipped:
+                    Unequipped();
+                    break;
+                case WeaponState.Pistol:
+                    Pistol();
+                    break;
+                //case WeaponState.Shotgun:
+                //    Shotgun();
+                //    break;
+                //case WeaponState.MachineGun:
+                //    MachineGun();
+                //    break;
+                //case WeaponState.Rifle:
+                    //Rifle();
+                    //break;
+            }
+            yield return null;
+        }
+    }
+
+    private void Unequipped()
+    {
+        Debug.Log("Unequipped");
+
+
+        Renderer[] _pistolRenders =                              //Pistol model is equal to
+            GameObject.FindGameObjectWithTag("Pistol")           //find pistol game object
+            .GetComponentsInChildren<Renderer>();                //and then find renderers
+        foreach (Renderer _pistolRenderTemp in _pistolRenders)   //for each render in the array
+            _pistolRenderTemp.enabled = false;                   //set render to false
+
+
+        //Renderer[] _shotgunRenders =                              //Shotgun model is equal to
+        //    GameObject.FindGameObjectWithTag("Shotgun")           //find shotgun game object
+        //    .GetComponentsInChildren<Renderer>();                //and then find renderers
+        //foreach (Renderer _shotgunRenderTemp in _shotgunRenders)   //for each render in the array
+        //    _shotgunRenderTemp.enabled = false;                   //set render to false
+
+
+        //Renderer[] _machinegunRenders =                              //machine gun model is equal to
+        //    GameObject.FindGameObjectWithTag("MachineGun")           //find machine gun game object
+        //    .GetComponentsInChildren<Renderer>();                //and then find renderers
+        //foreach (Renderer _machinegunRenderTemp in _machinegunRenders)   //for each render in the array
+        //    _machinegunRenderTemp.enabled = false;                   //set render to false
+
+
+        //Renderer[] _rifleRenders =                              //rifle model is equal to
+        //    GameObject.FindGameObjectWithTag("Rifle")           //find rifle game object
+        //    .GetComponentsInChildren<Renderer>();                //and then find renderers
+        //foreach (Renderer _rifleRenderTemp in _rifleRenders)   //for each render in the array
+            //_rifleRenderTemp.enabled = false;                   //set render to false
+
+
+
+        if (Input.GetAxis("Mouse ScrollWheel") > 0)  //if input equals mouse wheel up
+            _weaponState = Weapons.WeaponState.Pistol;  //then change state to Pistol
+        
+
+        //if (Input.GetAxis("Mouse ScrollWheel") < 0)  //if input equals mouse wheel down
+            //_weaponState = Weapons.WeaponState.Rifle;  //then change state to Rifle
+
+    }
+    private void Pistol()
+    {
+        Debug.Log("Pistol");
+
+        Renderer[] _pistolRenders =                              //Pistol model is equal to
+          GameObject.FindGameObjectWithTag("Pistol")           //find pistol game object
+          .GetComponentsInChildren<Renderer>();                //and then find renderers
+        foreach (Renderer _pistolRenderTemp in _pistolRenders)   //for each render in the array
+            _pistolRenderTemp.enabled = true;                   //set render to true
+
+
+        //Renderer[] _shotgunRenders =                              //Shotgun model is equal to
+        //    GameObject.FindGameObjectWithTag("Shotgun")           //find shotgun game object
+        //    .GetComponentsInChildren<Renderer>();                //and then find renderers
+        //foreach (Renderer _shotgunRenderTemp in _shotgunRenders)   //for each render in the array
+        //    _shotgunRenderTemp.enabled = false;                   //set render to false
+
+
+        //Renderer[] _machinegunRenders =                              //machine gun model is equal to
+        //    GameObject.FindGameObjectWithTag("MachineGun")           //find machine gun game object
+        //    .GetComponentsInChildren<Renderer>();                //and then find renderers
+        //foreach (Renderer _machinegunRenderTemp in _machinegunRenders)   //for each render in the array
+        //    _machinegunRenderTemp.enabled = false;                   //set render to false
+
+
+        //Renderer[] _rifleRenders =                              //rifle model is equal to
+        //    GameObject.FindGameObjectWithTag("Rifle")           //find rifle game object
+        //    .GetComponentsInChildren<Renderer>();                //and then find renderers
+        //foreach (Renderer _rifleRenderTemp in _rifleRenders)   //for each render in the array
+            //_rifleRenderTemp.enabled = false;                   //set render to false
+
+
+
+        //if (Input.GetAxis("Mouse ScrollWheel") > 0)  //if input equals mouse wheel up
+        //    _weaponState = Weapons.WeaponState.Shotgun;  //then change state to Shotgun
+
+        //if (Input.GetAxis("Mouse ScrollWheel") < 0)  //if input equals mouse wheel down
+            //_weaponState = Weapons.WeaponState.Unequipped;  //then change state to Unequipped
+    }
+    private void Shotgun()
+    {
+        Debug.Log("Shotgun");
+
+        Renderer[] _pistolRenders =                              //Pistol model is equal to
+          GameObject.FindGameObjectWithTag("Pistol")           //find pistol game object
+          .GetComponentsInChildren<Renderer>();                //and then find renderers
+        foreach (Renderer _pistolRenderTemp in _pistolRenders)   //for each render in the array
+            _pistolRenderTemp.enabled = false;                   //set render to false
+
+
+        //Renderer[] _shotgunRenders =                              //Shotgun model is equal to
+        //    GameObject.FindGameObjectWithTag("Shotgun")           //find shotgun game object
+        //    .GetComponentsInChildren<Renderer>();                //and then find renderers
+        //foreach (Renderer _shotgunRenderTemp in _shotgunRenders)   //for each render in the array
+        //    _shotgunRenderTemp.enabled = true;                   //set render to true
+
+
+        //Renderer[] _machinegunRenders =                              //machine gun model is equal to
+        //    GameObject.FindGameObjectWithTag("MachineGun")           //find machine gun game object
+        //    .GetComponentsInChildren<Renderer>();                //and then find renderers
+        //foreach (Renderer _machinegunRenderTemp in _machinegunRenders)   //for each render in the array
+        //    _machinegunRenderTemp.enabled = false;                   //set render to false
+
+
+        //Renderer[] _rifleRenders =                              //rifle model is equal to
+        //    GameObject.FindGameObjectWithTag("Rifle")           //find rifle game object
+        //    .GetComponentsInChildren<Renderer>();                //and then find renderers
+        //foreach (Renderer _rifleRenderTemp in _rifleRenders)   //for each render in the array
+        //    _rifleRenderTemp.enabled = false;                   //set render to false
+
+        //if (Input.GetAxis("Mouse ScrollWheel") > 0)  //if input equals mouse wheel up
+        //    _weaponState = Weapons.WeaponState.MachineGun;  //then change state to MachineGun
+
+
+        //if (Input.GetAxis("Mouse ScrollWheel") < 0)  //if input equals mouse wheel down
+            //_weaponState = Weapons.WeaponState.Pistol;  //then change state to Pistol
+    }
+    private void MachineGun()
+    {
+        Debug.Log("MachineGun");
+
+        Renderer[] _pistolRenders =                              //Pistol model is equal to
+          GameObject.FindGameObjectWithTag("Pistol")           //find pistol game object
+          .GetComponentsInChildren<Renderer>();                //and then find renderers
+        foreach (Renderer _pistolRenderTemp in _pistolRenders)   //for each render in the array
+            _pistolRenderTemp.enabled = false;                   //set render to false
+
+
+        //Renderer[] _shotgunRenders =                              //Shotgun model is equal to
+        //    GameObject.FindGameObjectWithTag("Shotgun")           //find shotgun game object
+        //    .GetComponentsInChildren<Renderer>();                //and then find renderers
+        //foreach (Renderer _shotgunRenderTemp in _shotgunRenders)   //for each render in the array
+        //    _shotgunRenderTemp.enabled = false;                   //set render to false
+
+
+        //Renderer[] _machinegunRenders =                              //machine gun model is equal to
+        //    GameObject.FindGameObjectWithTag("MachineGun")           //find machine gun game object
+        //    .GetComponentsInChildren<Renderer>();                //and then find renderers
+        //foreach (Renderer _machinegunRenderTemp in _machinegunRenders)   //for each render in the array
+        //    _machinegunRenderTemp.enabled = true;                   //set render to true
+
+
+        //Renderer[] _rifleRenders =                              //rifle model is equal to
+        //    GameObject.FindGameObjectWithTag("Rifle")           //find rifle game object
+        //    .GetComponentsInChildren<Renderer>();                //and then find renderers
+        //foreach (Renderer _rifleRenderTemp in _rifleRenders)   //for each render in the array
+        //    _rifleRenderTemp.enabled = false;                   //set render to false
+
+        //if (Input.GetAxis("Mouse ScrollWheel") > 0)  //if input equals mouse wheel up
+        //    _weaponState = Weapons.WeaponState.Rifle;  //then change state to Rifle
+
+
+        //if (Input.GetAxis("Mouse ScrollWheel") < 0)  //if input equals mouse wheel down
+            //_weaponState = Weapons.WeaponState.Shotgun;  //then change state to Shotgun
+    }
+    private void Rifle()
+    {
+        Debug.Log("Rifle");
+
+        Renderer[] _pistolRenders =                              //Pistol model is equal to
+          GameObject.FindGameObjectWithTag("Pistol")           //find pistol game object
+          .GetComponentsInChildren<Renderer>();                //and then find renderers
+        foreach (Renderer _pistolRenderTemp in _pistolRenders)   //for each render in the array
+            _pistolRenderTemp.enabled = false;                   //set render to false
+
+
+        //Renderer[] _shotgunRenders =                              //Shotgun model is equal to
+        //    GameObject.FindGameObjectWithTag("Shotgun")           //find shotgun game object
+        //    .GetComponentsInChildren<Renderer>();                //and then find renderers
+        //foreach (Renderer _shotgunRenderTemp in _shotgunRenders)   //for each render in the array
+        //    _shotgunRenderTemp.enabled = false;                   //set render to false
+
+
+        //Renderer[] _machinegunRenders =                              //machine gun model is equal to
+        //    GameObject.FindGameObjectWithTag("MachineGun")           //find machine gun game object
+        //    .GetComponentsInChildren<Renderer>();                //and then find renderers
+        //foreach (Renderer _machinegunRenderTemp in _machinegunRenders)   //for each render in the array
+        //    _machinegunRenderTemp.enabled = false;                   //set render to false
+
+
+        //Renderer[] _rifleRenders =                              //rifle model is equal to
+        //    GameObject.FindGameObjectWithTag("Rifle")           //find rifle game object
+        //    .GetComponentsInChildren<Renderer>();                //and then find renderers
+        //foreach (Renderer _rifleRenderTemp in _rifleRenders)   //for each render in the array
+        //    _rifleRenderTemp.enabled = true;                   //set render to true
+
+        //if (Input.GetAxis("Mouse ScrollWheel") > 0)  //if input equals mouse wheel up
+        //    _weaponState = Weapons.WeaponState.Unequipped;  //then change state to Unequipped
+
+
+        //if (Input.GetAxis("Mouse ScrollWheel") < 0)  //if input equals mouse wheel down
+            //_weaponState = Weapons.WeaponState.MachineGun;  //then change state to MachineGun
+    }
+
+}

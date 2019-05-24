@@ -1,0 +1,44 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+
+public class UI_Boilerdesknote : MonoBehaviour
+{
+    public GameObject note2;
+    public GameObject uiText2;
+    public AudioClip paper2;
+
+
+    //public bool enter = true;
+    //public bool exit = true;
+    public float time = 5; //Seconds to read the text
+
+    void Start()
+    {
+        uiText2.gameObject.SetActive(false);
+        note2.gameObject.SetActive(false);
+    }
+
+    void OnTriggerStay(Collider col)
+    {
+        //    if (enter)
+        //{
+        if (col.CompareTag("Player") && Input.GetKeyDown("joystick button 1"))
+        {
+            GetComponent<AudioSource>().PlayOneShot(paper2, 1); //lightswitch sound on
+            uiText2.gameObject.SetActive(true);
+            note2.gameObject.SetActive(true);
+        }
+    }
+
+
+    void OnTriggerExit(Collider col)
+    {
+
+        note2.gameObject.SetActive(false);
+    }
+}
+    
+
+

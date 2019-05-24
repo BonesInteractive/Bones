@@ -1,0 +1,67 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class flashlightToggle : MonoBehaviour
+{
+    public Light flashlightSource2;      //reference to our light
+    public Light flashlightOff;          //reference our backlit when looking at the light on flashlight
+
+    public float currentbatteryPower = 0f;     //defines our current battery power
+    public int maximumBatteryPower = 100;     //defines our max battery power
+
+    public float _lowDrainBatterySpeed = 2.5f;    //defines our low power battery speed
+    public float _highDrainBatterySpeed = 5.0f;    //defines our high power battery speed
+
+    public AudioClip soundTurnOn;         //assign audio clip
+    public AudioClip soundTurnOff;        //assign audio clip
+
+    public float _batteryBarLength;       //defines battery bar length
+
+    void Start()
+    {
+        currentbatteryPower = maximumBatteryPower;    //current battery power equals max on start up
+
+        flashlightSource2.enabled = false;
+        flashlightOff.enabled = false;
+
+    }
+
+    void Update()
+    {
+
+        _batteryBarLength = (Screen.width / 4) * (currentbatteryPower / (float) maximumBatteryPower);      //battery bar length is equal to quarter of screen width * our current power divided by max
+
+        if (Input.GetKeyDown("z") || Input.GetKeyDown("joystick button 0"))
+        {
+            GetComponent<AudioSource>().PlayOneShot(soundTurnOn, .6f);
+            flashlightSource2.enabled = !flashlightSource2.enabled;
+            flashlightOff.enabled = !flashlightOff.enabled;
+        }
+
+        if(currentbatteryPower > maximumBatteryPower)    //if current battery power is greater than max power
+        {
+            currentbatteryPower = maximumBatteryPower;    //then make current power to max power
+        }
+        if(currentbatteryPower < 0)                      //if cur power is less than zero
+        {
+            currentbatteryPower = 0;                     //then make current power equal to zero
+            flashlightSource2.enabled = false;           //you guessed it, main light source turns off
+            flashlightOff.enabled = false;              //back light turns off
+        }
+
+        if (flashlightSource2.enabled)                   //if the flashlight is enabled
+        {
+            currentbatteryPower -= _lowDrainBatterySpeed * Time.deltaTime;    //then minus our low drain speed from our current power
+        }
+    }
+
+
+    void OnGUI()
+    {
+        GUI.Box(new Rect(5, 35, _batteryBarLength, 20), "Battery");  //Displays our current battery power as a bar
+    }
+
+}
+        
+

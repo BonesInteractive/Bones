@@ -15,6 +15,7 @@ public class flashlightToggle : MonoBehaviour
 
     public AudioClip soundTurnOn;         //assign audio clip
     public AudioClip soundTurnOff;        //assign audio clip
+    public AudioClip batteryPickUpSound;  //assign audio clip
 
     public float _batteryBarLength;       //defines battery bar length
 
@@ -56,6 +57,17 @@ public class flashlightToggle : MonoBehaviour
         }
     }
 
+    public void AddBattery(int _batteryPowerAmount)
+    {
+        currentbatteryPower += _batteryPowerAmount;                            //add battery power amount to our current battery power
+
+        if(batteryPickUpSound != null)                                         //if we have a batter pick up assigned
+        {
+            GetComponent<AudioSource>().clip = batteryPickUpSound;             //then audio clip equals batteryPickUpSound
+            GetComponent<AudioSource>().Play();                                //and play sound
+        }
+    }
+
 
     void OnGUI()
     {
@@ -63,5 +75,8 @@ public class flashlightToggle : MonoBehaviour
     }
 
 }
+        
+
+
         
 

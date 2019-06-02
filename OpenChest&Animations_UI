@@ -1,0 +1,65 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+
+public class ShowChest1UI : MonoBehaviour
+{
+    public GameObject evielook1;
+    public GameObject Chest1;
+    public GameObject Prompt1;
+
+    public GameObject my_script1;
+    public string stopPlayerScript;
+    public string playPlayerScript;
+
+    private bool stopControl;
+    private bool gainControl = false;
+
+    public KeyCode checkItem;
+
+
+    void Start()
+    {
+        Prompt1.gameObject.SetActive(false);
+    }
+
+    void OnTriggerEnter(Collider col)
+    {
+        if (col.tag == "Player" && Input.GetKeyDown(checkItem) | Input.GetKeyDown("joystick button 1"))
+        {
+            if (!stopControl)
+            {
+                StartCoroutine(kneeling1());
+            }
+        }
+    }
+
+    IEnumerator kneeling1()
+    {
+        Prompt1.gameObject.SetActive(true);
+
+        (my_script1.GetComponent(stopPlayerScript) as MonoBehaviour).enabled = false;
+        evielook1.GetComponent<Animator>().Play("KneelingDown");
+        Chest1.GetComponent<Animation>().Play("OpenChestLid");
+
+        yield return new WaitForSeconds(4f);
+
+        evielook1.GetComponent<Animator>().Play("KneelingUp");
+        (my_script1.GetComponent(playPlayerScript) as MonoBehaviour).enabled = true;
+        print("thirdpersonusercontrolactivated");
+
+
+    }
+
+    void OnTriggerExit(Collider other)
+    {
+        if (other.tag == "Player")
+        {
+            Prompt1.gameObject.SetActive(false);
+        }
+    }
+}
+               
+      
+

@@ -1,0 +1,33 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+
+public class LevelSwitch : MonoBehaviour
+{
+    public int scene;
+
+    bool loaded;
+
+    public GameObject loadingGame;
+    public AudioClip doorSound;
+
+
+    void OnTriggerEnter()
+    {
+    
+        if (!loaded)
+        {
+            if (Input.GetKeyDown("space") | Input.GetKeyDown("joystick button 1"))
+            {
+                loadingGame.SetActive(true);
+                GetComponent<AudioSource>().PlayOneShot(doorSound, 1);
+
+                SceneManager.LoadSceneAsync(scene, LoadSceneMode.Additive);
+
+                loaded = true;                                                  //set the bool to true so the scenemanager above doesn't duplicate constanstly
+
+            }
+        }
+    }
+}

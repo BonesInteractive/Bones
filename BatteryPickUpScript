@@ -1,3 +1,5 @@
+//GUI is set to this script, might want to use slider instead but everything works here. GUI issues with resolution
+
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -7,19 +9,57 @@ public class BatteryPickUpScript : MonoBehaviour
 
     public int _batteryPowerAmount = 50;                                //defines the amount of power the battery has
 
+    private bool triggered;
+
+    public GameObject pickUpBattery;
+
+    void Awake()
+    {
+        pickUpBattery.gameObject.SetActive(false);
+    }
 
 
     private void OnTriggerEnter(Collider bat)
     {
         if(bat.tag == "Player")                                         //if the gameobject with the tag Player enters the collider
         {
+
+            //put an image here if you like to see what item you picked up, graphics go here
+
+            pickUpBattery.gameObject.SetActive(true);                   //shows text prompt
+
+            StartCoroutine(TriggerLabel());
+
             flashlightToggle temp =                                     //creates a temp variable
             GameObject.FindGameObjectWithTag("Player").                 //find the player game object
                 GetComponentInChildren<flashlightToggle>();             //get the flashlight script
 
             temp.AddBattery(_batteryPowerAmount);                       //access the addbattery function and pass in variable of batterypoweramount
-            Destroy(gameObject);                                        //Destroy the battery game object
+            //Destroy(gameObject);                                        //Destroy the battery game object
+        }
+    }
+
+    IEnumerator TriggerLabel()
+    {
+        triggered = true;
+       
+        yield return new WaitForSeconds(2.5f);                          //wait 2.5 seconds for prompt and/or graphics to close
+        pickUpBattery.gameObject.SetActive(false);                      //closes text prompt
+        Debug.Log("pickUpBatterprompt should be off");
+
+        Destroy(gameObject);                                             //Destroy the battery game object
+        yield return null;
+
+
+    }
+
+    void OnGUI()
+    {
+        if (triggered)                                                         //if bool is true then below follows
+        {
+            GUI.Label(new Rect(10, 10, 5, 20), "You Collected a Battery");   //calls a UI label and text shown
         }
     }
 
 }
+

@@ -14,6 +14,8 @@ public class Dialog : MonoBehaviour
     public string[] sentences; //this will hold all of your dialogue
     private int index;
     public float typingSpeed = 0.2f;
+    
+    public int scene;  //scene # to load
 
     public GameObject continueButton;
 
@@ -68,10 +70,19 @@ public class Dialog : MonoBehaviour
                 textDisplay.text = ""; //resets the text when the dialogue is completed
                 continueButton.SetActive(false); //when the dialogue ends this should be disabled
                                                  //print("continueButton should be off after this");
-
-            }
+          OnConversationEnd();                   //this calls and allows to end conversation and load new scene after dialogue has ended
         }
+        }
+
+     void OnConversationEnd()                    //this calls and allows to end conversation and load new scene after dialogue has ended
+    {
+        SceneManager.LoadScene(scene, LoadSceneMode.Single);
     }
+    
+    }
+
+            
+        
 
 
 

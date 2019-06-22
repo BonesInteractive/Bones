@@ -1,5 +1,5 @@
 //To make the navigation click on first hit with space bar or any other key you prefer, make sure you put the Continue Button game object in the Event System > and in First Selected
-
+//Make sure to check the box where it says Send Navigation Events
 
 
 using System.Collections;

@@ -1,0 +1,83 @@
+//To make the navigation click on first hit with space bar or any other key you prefer, make sure you put the Continue Button game object in the Event System > and in First Selected
+
+
+
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using TMPro;
+using UnityEngine.UI;
+
+public class Dialog : MonoBehaviour
+{
+    public TextMeshProUGUI textDisplay;
+    public string[] sentences; //this will hold all of your dialogue
+    private int index;
+    public float typingSpeed = 0.2f;
+
+    public GameObject continueButton;
+
+
+    private AudioSource source1;
+
+
+    void Start()
+    {
+        source1 = GetComponent<AudioSource>(); //Find AudioSource
+        StartCoroutine(Type());
+    }
+
+    void Update()
+    {
+        //if (Input.GetKeyDown("space"))
+        //{
+
+            if (textDisplay.text == sentences[index]) //this will let the code know the whole sentence is typed out
+            {
+                continueButton.SetActive(true);
+            }
+
+        }
+
+    IEnumerator Type()
+    {
+
+        foreach (char letter in sentences[index].ToCharArray())
+        {
+            textDisplay.text += letter;
+            yield return new WaitForSeconds(typingSpeed);
+        }
+
+
+    }
+
+    public void NextSentence()
+    {
+
+            source1.Play(); //if you wanted to play a sound //if you want to animate text here
+            continueButton.SetActive(false); //this way the player cant spam click it.
+
+            if (index < sentences.Length - 1) //if statement that is checking the index is less than the number of elements in the sentence because array's start at 0
+            {
+                index++;
+                textDisplay.text = "";
+                StartCoroutine(Type()); //This starts the next sentence
+            }
+            else
+            {
+                textDisplay.text = ""; //resets the text when the dialogue is completed
+                continueButton.SetActive(false); //when the dialogue ends this should be disabled
+                                                 //print("continueButton should be off after this");
+
+            }
+        }
+    }
+
+
+
+
+    
+
+
+
+

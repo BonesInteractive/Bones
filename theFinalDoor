@@ -89,5 +89,102 @@ public class DoorJustOpens : MonoBehaviour
 
         }
     }
+    
+
+
+
+NOTE: Here is the other side of the door trigger. Reverse side.
+    
+    
+    using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+
+public class EduDoorMirrorOpen : MonoBehaviour
+{
+    public GameObject doorOpening;
+   // public GameObject evieDoor;
+
+    public GameObject promptOnScreen;
+
+    public AudioClip DoorCreek;
+    public AudioClip DoorClose;
+
+    Animation anim;
+
+    public GameObject my_script;
+    public string stopThirdPersonUserControlScript;
+
+    public GameObject my_script2;
+    public string stopThirdPersonCharacter;
+
+    public GameObject thePlayer;
+    public GameObject theDoor;
+    public GameObject theOtherTrigger;
+
+    public Rigidbody rigidbody;
+
+    void Start()
+    {
+        promptOnScreen.gameObject.SetActive(false);
+        //print("promptOnScreen text not showing");
+    }
+
+    void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Player"))
+            promptOnScreen.gameObject.SetActive(true);
+    }
+
+    void OnTriggerStay(Collider other)
+    {
+            if (other.tag == "Player" && Input.GetKeyDown("space") | Input.GetKeyDown("joystick button 1"))
+            {
+                StartCoroutine(WaitingOnDoor());
+ 
+       
+        }
+    }
+
+    IEnumerator WaitingOnDoor()
+    {
+        //(my_script.GetComponent(stopThirdPersonUserControlScript) as MonoBehaviour).enabled = false;
+        //(my_script2.GetComponent(stopThirdPersonCharacter) as MonoBehaviour).enabled = false;
+
+
+        theDoor.gameObject.GetComponent<BoxCollider>().enabled = false;
+        theOtherTrigger.gameObject.GetComponent<BoxCollider>().enabled = false;
+        rigidbody.isKinematic = true;
+
+        doorOpening.GetComponent<Animator>().Play("EducationDoorMirror");
+       
+        GetComponent<AudioSource>().PlayOneShot(DoorCreek, 1);
+
+        yield return new WaitForSeconds(1.8f);
+
+        //(my_script.GetComponent(stopThirdPersonUserControlScript) as MonoBehaviour).enabled = true;
+        //(my_script2.GetComponent(stopThirdPersonCharacter) as MonoBehaviour).enabled = true;
+        
+        rigidbody.isKinematic = false;
+        theDoor.gameObject.GetComponent<BoxCollider>().enabled = false;
+        theOtherTrigger.gameObject.GetComponent<BoxCollider>().enabled = false;
+
+        yield return new WaitForSeconds(2f);
+        theDoor.gameObject.GetComponent<BoxCollider>().enabled = true;
+        theOtherTrigger.gameObject.GetComponent<BoxCollider>().enabled = true;
+        GetComponent<AudioSource>().PlayOneShot(DoorClose, 1);
+
+    }
+
+    void OnTriggerExit(Collider other)
+    {
+        if (other.tag == "Player")
+        {
+            promptOnScreen.gameObject.SetActive(false);
+
+        }
+    }
+}
 }
  

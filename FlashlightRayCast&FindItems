@@ -1,0 +1,31 @@
+ NOTE: this is only the code but this does work, this part of the code is when you turn on the flashlight inside the flashlight toggle script. The Raycast begins when you turn on the flashlight.
+ 
+ 
+ Vector3 playerPosition = transform.position;
+            Vector3 forwardDirection = transform.forward;
+
+            Ray interactionRay = new Ray(playerPosition, forwardDirection);
+            RaycastHit interactionRayHit;
+            float interactionRayLength = 5.0f;
+
+            Vector3 interactionRayEndpoint = forwardDirection * interactionRayLength;       //will give you the position
+            Debug.DrawLine(playerPosition, interactionRayEndpoint);                            //this will show the debug drawline on ray length
+
+            bool hitFound = Physics.Raycast(interactionRay, out interactionRayHit, interactionRayLength);
+
+     
+            if (hitFound)
+            {
+                if (interactionRayHit.collider.gameObject.tag == "batteryTAG")
+                {
+                    GetComponent<AudioSource>().PlayOneShot(foundItem, 1);
+                    GameObject hitGameObject = interactionRayHit.transform.gameObject;
+                    string hitFeedBack = hitGameObject.name;
+                    Debug.Log(hitFeedBack);
+                }
+            }
+            else
+            {
+                string nothingHitFeedBack = ".";
+                Debug.Log(nothingHitFeedBack);
+            }

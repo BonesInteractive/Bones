@@ -1,3 +1,5 @@
+NOTE: Updated on July 3rd, 2019
+NOTE: the GUI Label is not matching the resolution, only problem with this script
 
 using System.Collections;
 using System.Collections.Generic;
@@ -5,27 +7,58 @@ using UnityEngine;
 
 public class flashlightToggle : MonoBehaviour
 {
-    public Light flashlightSource2;      //reference to our light
-    public Light flashlightOff;          //reference our backlit when looking at the light on flashlight
+    public GameObject[] collectables;
+    public Collider[] allEnable;
 
-    public float currentbatteryPower = 0f;     //defines our current battery power
-    public int maximumBatteryPower = 100;     //defines our max battery power
+    public GameObject batteryWeCollectCollider;
+    public GameObject batteryWeCollectCollider2;
 
-    public float _lowDrainBatterySpeed = 2.5f;    //defines our low power battery speed
-    public float _highDrainBatterySpeed = 5.0f;    //defines our high power battery speed
+    public GameObject sparkleEnable;                                            //enables sparkle effect when finding an item
+    public GameObject sparkleEnable2;
 
-    public AudioClip soundTurnOn;         //assign audio clip
-    public AudioClip soundTurnOff;        //assign audio clip
-    public AudioClip batteryPickUpSound;  //assign audio clip
+    //Items that will be picked up
+    //[SerializeField]
+    public Collider batteryColliderEnable;                                      //used to enable collider when flashlight raycast hits the item
+    public Collider batteryColliderEnable2;
 
-    public float _batteryBarLength;       //defines battery bar length
 
-    public float _maxFlickerSpeed = 1f;         //defines are max light flicker speed
-    public float _minFlickerSpeed = 0.1f;       //defines are min light flicker speed
+    bool soundPlayed = false;
+    bool soundPlayed2 = false;
+
+
+
+    public Light flashlightSource2;                                             //reference to our light
+    public Light flashlightOff;                                                 //reference our backlit when looking at the light on flashlight
+
+    public float currentbatteryPower = 0f;                                      //defines our current battery power
+    public int maximumBatteryPower = 100;                                       //defines our max battery power
+
+    public float _lowDrainBatterySpeed = 2.5f;                                  //defines our low power battery speed
+    public float _highDrainBatterySpeed = 5.0f;                                 //defines our high power battery speed
+
+    public AudioClip soundTurnOn;                                               //assign audio clip
+    public AudioClip soundTurnOff;                                              //assign audio clip
+    public AudioClip batteryPickUpSound;                                        //assign audio clip
+    public AudioClip foundItem;
+
+    public float _batteryBarLength;                                             //defines battery bar length
+
+    public float _maxFlickerSpeed = 1f;                                         //defines are max light flicker speed
+    public float _minFlickerSpeed = 0.1f;                                       //defines are min light flicker speed
+
+    public float x;
+    public float y;
 
     void Start()
     {
-        currentbatteryPower = maximumBatteryPower;    //current battery power equals max on start up
+        currentbatteryPower = maximumBatteryPower;                              //current battery power equals max on start up
+
+        batteryColliderEnable.enabled = false;
+        batteryColliderEnable2.enabled = false;
+        //allEnable = GetComponent<Collider>();
+
+        sparkleEnable.GetComponent<ParticleSystem>().Stop();
+        sparkleEnable2.GetComponent<ParticleSystem>().Stop();
 
         flashlightSource2.enabled = false;
         flashlightOff.enabled = false;
@@ -34,86 +67,176 @@ public class flashlightToggle : MonoBehaviour
 
     void Update()
     {
+        _batteryBarLength = (Screen.width / 4) * (currentbatteryPower / (float)maximumBatteryPower);      //battery bar length is equal to quarter of screen width * our current power divided by max
 
-        _batteryBarLength = (Screen.width / 4) * (currentbatteryPower / (float) maximumBatteryPower);      //battery bar length is equal to quarter of screen width * our current power divided by max
-
-        if (Input.GetKeyDown("z") || Input.GetKeyDown("joystick button 0"))
+        if (Input.GetKeyDown("f") || Input.GetKeyDown("joystick button 0"))
         {
             GetComponent<AudioSource>().PlayOneShot(soundTurnOn, .6f);
             flashlightSource2.enabled = !flashlightSource2.enabled;
             flashlightOff.enabled = !flashlightOff.enabled;
         }
 
-        if(currentbatteryPower > maximumBatteryPower)       //if current battery power is greater than max power
+        if (currentbatteryPower > maximumBatteryPower)                          //if current battery power is greater than max power
         {
-            currentbatteryPower = maximumBatteryPower;      //then make current power to max power
+            currentbatteryPower = maximumBatteryPower;                          //then make current power to max power
         }
-        if(currentbatteryPower < 0)                         //if cur power is less than zero
+        if (currentbatteryPower < 0)                                            //if cur power is less than zero
         {
-            currentbatteryPower = 0;                        //then make current power equal to zero
-            flashlightSource2.enabled = false;              //you guessed it, main light source turns off
-            flashlightOff.enabled = false;                  //back light turns off
-        }
-
-
-        if(currentbatteryPower < 10)                        //if current battery power is less than 10
-        {
-            StartCoroutine("FlashlightModifier");           //then will start flashlight modifier function to flickering
-        }
-
-        if (currentbatteryPower > 10)                       //if current battery power is greater than 10
-        {
-            StopCoroutine("FlashlightModifier");            //then will stop flashlight modifier function to flickering
-        }
-
-        if(currentbatteryPower == 0)
-        {
-            StopCoroutine("FlashlightModifier");            ////then will stop flashlight modifier function
-            flashlightSource2.enabled = false;              //and disables the flashlight
-            flashlightOff.enabled = false;                  //and disables the back light
-            return;                                         //return because 
+            currentbatteryPower = 0;                                            //then make current power equal to zero
+            flashlightSource2.enabled = false;                                  //you guessed it, main light source turns off
+            flashlightOff.enabled = false;                                      //back light turns off
         }
 
 
-        if (flashlightSource2.enabled)                                        //if the flashlight is enabled
+        if (currentbatteryPower < 10)                                           //if current battery power is less than 10
         {
-            currentbatteryPower -= _lowDrainBatterySpeed * Time.deltaTime;    //then minus our low drain speed from our current power
+            StartCoroutine("FlashlightModifier");                               //then will start flashlight modifier function to flickering
+        }
+
+        if (currentbatteryPower > 10)                                           //if current battery power is greater than 10
+        {
+            StopCoroutine("FlashlightModifier");                                //then will stop flashlight modifier function to flickering
+        }
+
+        if (currentbatteryPower == 0)
+        {
+            StopCoroutine("FlashlightModifier");                                ////then will stop flashlight modifier function
+            flashlightSource2.enabled = false;                                  //and disables the flashlight
+            flashlightOff.enabled = false;                                      //and disables the back light
+            return;                                                             //return because 
+        }
+
+
+        if (flashlightSource2.enabled)                                          //if the flashlight is enabled
+        {
+            currentbatteryPower -= _lowDrainBatterySpeed * Time.deltaTime;      //then minus our low drain speed from our current power
+
+            Vector3 playerPosition = transform.position;
+            Vector3 forwardDirection = transform.forward;
+
+            Ray interactionRay = new Ray(playerPosition, forwardDirection);
+            RaycastHit interactionRayHit;
+            float interactionRayLength = 5.0f;
+
+            Vector3 interactionRayEndpoint = forwardDirection * interactionRayLength;           //will give you the position
+            Debug.DrawLine(playerPosition, interactionRayEndpoint);                            //this will show the debug drawline on ray length
+
+            bool hitFound = Physics.Raycast(interactionRay, out interactionRayHit, interactionRayLength);
+
+     
+            if (hitFound)
+            {
+                if (!soundPlayed && interactionRayHit.collider.gameObject.tag == "batteryTAG")
+                {
+
+                    GetComponent<AudioSource>().PlayOneShot(foundItem, 1);
+                    soundPlayed = true;
+
+                    sparkleEnable.GetComponent<ParticleSystem>().Play();         
+
+                    batteryWeCollectCollider.SetActive(true);
+
+                    batteryColliderEnable.enabled = true;
+
+
+                    GameObject hitGameObject = interactionRayHit.transform.gameObject;
+                    //string hitFeedBack = hitGameObject.name;
+                    //Debug.Log(hitFeedBack);
+
+                }
+            }
+            else
+            {
+                //string nothingHitFeedBack = ".";         
+               
+                //Debug.Log(nothingHitFeedBack);
+
+                batteryWeCollectCollider.SetActive(false);
+
+                if (soundPlayed) soundPlayed = false;
+            }
+
+            if (hitFound)
+            {
+                if (!soundPlayed2 && interactionRayHit.collider.gameObject.tag == "batteryTAG2")
+                {
+
+                    GetComponent<AudioSource>().PlayOneShot(foundItem, 1);
+                    soundPlayed2 = true;
+
+                    sparkleEnable2.GetComponent<ParticleSystem>().Play();
+                   
+                    batteryWeCollectCollider2.SetActive(true);
+
+                    batteryColliderEnable2.enabled = true;
+
+                    GameObject hitGameObject = interactionRayHit.transform.gameObject;
+                    //string hitFeedBack = hitGameObject.name;
+                    //Debug.Log(hitFeedBack);
+
+                }
+            }
+            else
+            {
+                //string nothingHitFeedBack = ".";         
+
+                //Debug.Log(nothingHitFeedBack);
+
+                batteryWeCollectCollider2.SetActive(false);
+
+                if (soundPlayed2) soundPlayed2 = false;
+            }
         }
     }
 
 
     IEnumerator FlashlightModifier()
     {
-        flashlightSource2.enabled = true;                                    //enable flashlight
-        flashlightOff.enabled = true;                                        //enable flashlight
-        yield return new WaitForSeconds                                      //between
-            (Random.Range(_minFlickerSpeed, _maxFlickerSpeed));              //the min flicker speed and max
+        flashlightSource2.enabled = true;                                       //enable flashlight
+        flashlightOff.enabled = true;                                           //enable flashlight
+        yield return new WaitForSeconds                                         //between
+            (Random.Range(_minFlickerSpeed, _maxFlickerSpeed));                 //the min flicker speed and max
 
-        flashlightSource2.enabled = false;                                    //disable flashlight
-        flashlightOff.enabled = false;                                       //disable flashlight
-        yield return new WaitForSeconds                                      //between
-            (Random.Range(_minFlickerSpeed, _maxFlickerSpeed));              //the min flicker speed and max
+        flashlightSource2.enabled = false;                                      //disable flashlight
+        flashlightOff.enabled = false;                                          //disable flashlight
+        yield return new WaitForSeconds                                         //between
+            (Random.Range(_minFlickerSpeed, _maxFlickerSpeed));                 //the min flicker speed and max
     }
 
 
     public void AddBattery(int _batteryPowerAmount)
     {
-        currentbatteryPower += _batteryPowerAmount;                            //add battery power amount to our current battery power
+        currentbatteryPower += _batteryPowerAmount;                             //add battery power amount to our current battery power
 
-        if(batteryPickUpSound != null)                                         //if we have a batter pick up assigned
+        if(batteryPickUpSound != null)                                          //if we have a battery pick up assigned
         {
-            GetComponent<AudioSource>().clip = batteryPickUpSound;             //then audio clip equals batteryPickUpSound
-            GetComponent<AudioSource>().Play();                                //and play sound
+            GetComponent<AudioSource>().PlayOneShot(batteryPickUpSound, 1);
+
+            //GetComponent<AudioSource>().clip = batteryPickUpSound;            //then audio clip equals batteryPickUpSound
+            //GetComponent<AudioSource>().Play();                               //and play sound
         }
     }
 
 
     void OnGUI()
     {
-        GUI.Box(new Rect(5, 35, _batteryBarLength, 20), "Battery");  //Displays our current battery power as a bar
+  
+        //GUI.matrix = Matrix4x4.Scale(new Vector3(x / 1280, y / 720, 1));
+
+        //GUI.matrix = Matrix4x4.Scale(new Vector3(x / 1920, y / 1080, 1));
+
+        GUI.Box(new Rect(80, 19, _batteryBarLength, 20), "Battery Life");
+
+        //GUI.Box(new Rect(80, 19, _batteryBarLength, 20), "Battery Life");
+        //this isn't set for the correct resolution for 1920x1080, at 16:9 its fine
+
     }
 
 }
+        
+
+
+
         
 
 

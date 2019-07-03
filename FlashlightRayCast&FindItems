@@ -1,5 +1,5 @@
  NOTE: this is only the code but this does work, this part of the code is when you turn on the flashlight inside the flashlight toggle script. The Raycast begins when you turn on the flashlight.
- 
+ NOTE: This works on one item. To do two or more copy the if(hitFound) code lines and end it with the else statements.
  
  Vector3 playerPosition = transform.position;
             Vector3 forwardDirection = transform.forward;

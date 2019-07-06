@@ -1,4 +1,6 @@
 NOTE: This is the script that is called to stop duplicates when scenes are changed
+NOTE: in order to call this script in another script, use this: ArrayOfBools.callScript.someMethod();
+NOTE: callScript is a private variable in other script.
 
 using System.Collections;
 using System.Collections.Generic;

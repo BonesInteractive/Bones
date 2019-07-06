@@ -11,16 +11,22 @@ public class flashlightToggle : MonoBehaviour
     public Collider[] allEnable;
 
     public GameObject batteryWeCollectCollider;
+    private ArrayOfBools callScript;
     public GameObject batteryWeCollectCollider2;
 
     public GameObject sparkleEnable;                                            //enables sparkle effect when finding an item
     public GameObject sparkleEnable2;
+
+    public GameObject myPlayer;
 
     //Items that will be picked up
     //[SerializeField]
     public Collider batteryColliderEnable;                                      //used to enable collider when flashlight raycast hits the item
     public Collider batteryColliderEnable2;
 
+
+    public static bool batteryAlreadyCollected = false;
+   
 
     bool soundPlayed = false;
     bool soundPlayed2 = false;
@@ -62,6 +68,9 @@ public class flashlightToggle : MonoBehaviour
 
         flashlightSource2.enabled = false;
         flashlightOff.enabled = false;
+
+        //singleton.GetComponent<GlobalBattery>();
+        //GetComponent<GlobalBattery>();
 
     }
 
@@ -116,28 +125,29 @@ public class flashlightToggle : MonoBehaviour
 
             Ray interactionRay = new Ray(playerPosition, forwardDirection);
             RaycastHit interactionRayHit;
-            float interactionRayLength = 5.0f;
+            float interactionRayLength = 6.0f;                                  //raycast draw line length to find pick ups
 
             Vector3 interactionRayEndpoint = forwardDirection * interactionRayLength;           //will give you the position
             Debug.DrawLine(playerPosition, interactionRayEndpoint);                            //this will show the debug drawline on ray length
 
             bool hitFound = Physics.Raycast(interactionRay, out interactionRayHit, interactionRayLength);
 
-     
-            if (hitFound)
+
+            if (hitFound) //&& Input.GetKeyDown("joystick button 1") || Input.GetKeyDown("space")) //NOTE: THis is not working
             {
                 if (!soundPlayed && interactionRayHit.collider.gameObject.tag == "batteryTAG")
                 {
-
                     GetComponent<AudioSource>().PlayOneShot(foundItem, 1);
                     soundPlayed = true;
-
-                    sparkleEnable.GetComponent<ParticleSystem>().Play();         
-
+                    sparkleEnable.GetComponent<ParticleSystem>().Play();
                     batteryWeCollectCollider.SetActive(true);
+
+                    batteryAlreadyCollected = true;
 
                     batteryColliderEnable.enabled = true;
 
+                    ArrayOfBools.batteryPickup1 = true;                     //bool is called true 
+                    ArrayOfBools.callScript.someMethod();                   //this calls the arrayofbools script to keep items from duplicating
 
                     GameObject hitGameObject = interactionRayHit.transform.gameObject;
                     //string hitFeedBack = hitGameObject.name;
@@ -145,16 +155,19 @@ public class flashlightToggle : MonoBehaviour
 
                 }
             }
+
             else
             {
                 //string nothingHitFeedBack = ".";         
-               
+
                 //Debug.Log(nothingHitFeedBack);
 
                 batteryWeCollectCollider.SetActive(false);
 
                 if (soundPlayed) soundPlayed = false;
+
             }
+    
 
             if (hitFound)
             {
@@ -233,6 +246,13 @@ public class flashlightToggle : MonoBehaviour
     }
 
 }
+        
+
+
+
+   
+
+
         
 
 

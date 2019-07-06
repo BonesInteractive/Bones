@@ -1,0 +1,39 @@
+NOTE: This is the script that is called to stop duplicates when scenes are changed
+
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+//NOTE: This is a singleton
+
+public class ArrayOfBools : MonoBehaviour
+{
+    public static ArrayOfBools callScript;
+    //public AudioClip silenceSound;
+
+    public static bool batteryPickup1;
+    public static bool batteryPickup2;
+    internal bool mybool;
+
+    void Awake()
+    {
+        someMethod();
+        Debug.Log("Started someMethod");
+    }
+
+    public void someMethod()
+    {
+        if (batteryPickup1)
+        {
+            batteryPickup1 = true;
+            Destroy(this.gameObject);
+            Debug.Log("destroyed battery pickup 1");
+        }
+        if (batteryPickup2)
+        {
+            batteryPickup2 = true;
+            Destroy(this.gameObject);
+            Debug.Log("destroyed battery pickup 2");
+        }
+    }
+}

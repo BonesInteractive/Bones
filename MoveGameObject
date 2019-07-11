@@ -1,0 +1,68 @@
+NOTE: The example given below is for a wooden pallet blocking a hole underground. the screen fades, the pallet is removed, screen fades in and hole is seen
+
+
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class MoveGameObject : MonoBehaviour
+{
+
+    public GameObject PalletRemove;
+    public GameObject PalletOnGround;
+    public GameObject removerBoxCollider;
+    public GameObject theHole;
+
+    public GameObject palletText;
+
+    public GameObject FadeOut;
+    public GameObject FadingIn;
+
+    public AudioClip PalletMoveSound;
+
+    private void Awake()
+    {
+        palletText.SetActive(false);
+    }
+
+    void OnTriggerStay()
+    {
+        if (Input.GetKeyDown("space") | Input.GetKeyDown("joystick button 1"))
+        {
+            StartCoroutine(CheckingPallet());      
+        }
+    }
+
+    IEnumerator CheckingPallet()
+    {
+        palletText.SetActive(true);
+        yield return new WaitForSeconds(2f);
+        FadeOut.SetActive(true);
+        fadingBackIn();
+
+    }
+
+    void fadingBackIn()
+    {
+        StartCoroutine(startFadeIn());
+    }
+
+    IEnumerator startFadeIn()
+    {
+        GetComponent<AudioSource>().PlayOneShot(PalletMoveSound, 1);
+        removerBoxCollider.SetActive(false);
+        theHole.SetActive(true);
+        palletText.SetActive(false);
+        yield return new WaitForSeconds(2f);
+        PalletRemove.SetActive(false);
+        PalletOnGround.SetActive(true);
+        FadeOut.SetActive(false);
+        FadingIn.SetActive(true);
+
+        Debug.Log("Played All Events");
+        //FadeIn.SetActive(true);
+    }
+
+
+
+}

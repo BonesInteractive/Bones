@@ -1,0 +1,273 @@
+NOTE: There are 3 scripts in this file that are in order from first to last event. The havepipewrench script is the singleton to keep things from coming back if you leave and come back to an old scene.
+
+//NOTE: below is kneeling and checking a gameobject
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+
+public class KneelandCheck : MonoBehaviour
+{
+    public GameObject myKey;
+    public GameObject evielook1;
+
+    public GameObject Prompt1;
+    public GameObject Prompt2;
+
+    public AudioClip valveTurnSound;
+
+    public GameObject my_script1;
+    public string stopPlayerScript;
+    public string playPlayerScript;
+
+    private bool stopControl;
+    private bool gainControl = false;
+    private bool secondTrigger = false;
+
+    private bool myWrenchCollected = false;
+
+    public KeyCode checkItem;
+
+
+    void Start()
+    {
+
+        Prompt1.gameObject.SetActive(false);
+        Prompt2.gameObject.SetActive(false);
+    }
+
+    void OnTriggerEnter(Collider col)
+    {
+        //Prompt1.gameObject.SetActive(true);
+
+        if (col.CompareTag("Player") && Input.GetKeyDown(checkItem) | Input.GetKeyDown("joystick button 1") | Input.GetKeyDown("space"))
+        {
+            if (!stopControl)
+            {
+                Prompt1.gameObject.SetActive(true);
+
+                secondTrigger = true;
+
+                StartCoroutine(kneeling1());
+            }
+        }
+
+        IEnumerator kneeling1()
+        {
+            (my_script1.GetComponent(stopPlayerScript) as MonoBehaviour).enabled = false;
+            evielook1.GetComponent<Animator>().Play("KneelingDown");
+
+
+            yield return new WaitForSeconds(4f);
+
+            yield return StartCoroutine(kneelingUp());
+
+            evielook1.GetComponent<Animator>().Play("KneelingUp");
+            (my_script1.GetComponent(playPlayerScript) as MonoBehaviour).enabled = true;
+            print("thirdpersonusercontrolactivated");
+        }
+
+        IEnumerator kneelingUp()
+        {
+            evielook1.GetComponent<Animator>().Play("KneelingUp");
+
+            Prompt1.gameObject.SetActive(false);                                                                // turns off text prompt
+
+            //this.gameObject.GetComponent<BoxCollider>().enabled = false;                                        // turns off box collider
+
+            yield return new WaitForSeconds(1.2f);
+
+            (my_script1.GetComponent(playPlayerScript) as MonoBehaviour).enabled = true;                        //turns back on the Third Person Controls
+
+            checkObjectAgain();
+
+        }
+
+        void checkObjectAgain()
+        {
+            if (secondTrigger)
+            {
+                Prompt2.gameObject.SetActive(true);
+                StartCoroutine(secondTriggerActive());
+            }
+        }
+
+        IEnumerator secondTriggerActive()
+        {
+            yield return new WaitForSeconds(3f);
+            Prompt2.gameObject.SetActive(false);
+
+        }
+
+    }
+}
+
+
+//NOTE: Next script is a classic pipe wrench pick up. you pick this up to activate the valve script
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+
+public class PipeWrench_PickUp : MonoBehaviour
+{
+
+    public GameObject thePipeWrench;
+    public GameObject TextBox;
+    public AudioClip source;
+
+    public static bool pipeWrenchTaken = false;
+
+    public Collider NewColliderToTurnValve;
+    public Collider oldColliderOnValve;
+
+    void Start()
+    {
+        TextBox.SetActive(false);
+    }
+
+
+    void OnTriggerStay(Collider environmentCheck)
+    {
+        if (environmentCheck.CompareTag("Player") && Input.GetKeyDown("space") || Input.GetKeyDown("joystick button 1")) //tag Player, space bar on keyboard and ps4 X
+        {
+            StartCoroutine(NowChecking());
+        }
+
+    }
+
+    IEnumerator NowChecking()
+    {
+        GetComponent<AudioSource>().PlayOneShot(source, 1);
+
+
+
+        TextBox.SetActive(true);
+        pipeWrenchTaken = true;
+        yield return new WaitForSeconds(2);
+        TextBox.SetActive(false);
+        ifpipeWrenchTaken();
+        //yield return null;
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.CompareTag("Player"))
+        {
+            TextBox.SetActive(false);
+        }
+    }
+
+    public void ifpipeWrenchTaken()
+    {
+        if (pipeWrenchTaken)
+        {
+            thePipeWrench.SetActive(false);
+            TextBox.SetActive(false);
+
+            NewColliderToTurnValve.gameObject.SetActive(true);
+            oldColliderOnValve.gameObject.SetActive(false);
+
+            HavePipeWrench.pipewrenchPickUp1 = true;
+            HavePipeWrench.callPipeWrenchScript.pickedupPipeWrench();
+        }
+    }
+}
+
+
+
+//NOTE: This script allows the valve to be turned and closed, closing the drain at the front of the museum.  
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class Valve_Allowed : MonoBehaviour
+{
+    public static Valve_Allowed callValve_AllowedScript;
+
+    public GameObject myKey;
+    public AudioClip valveTurnSound;
+
+    public static bool valveClose = false;
+
+    private void OnTriggerEnter(Collider other)
+    {
+
+        if (other.CompareTag("Player") && !myKey | HavePipeWrench.pipewrenchPickUp1 | Input.GetKeyDown("joystick button 1") | Input.GetKeyDown("space"))
+        {
+            //if (myKey == true)
+            {
+
+                HavePipeWrench.pipewrenchPickUp1 = true;
+                GetComponent<AudioSource>().PlayOneShot(valveTurnSound, 1);
+                Debug.Log("valve is turning with sound");
+
+                StartCoroutine(OneTimeOnly());
+
+            }
+        }
+    }
+
+    IEnumerator OneTimeOnly()
+    {
+        valveClose = true;
+        HavePipeWrench.colliderForValveDisabled = true;
+        yield return new WaitForSeconds(2);
+        Destroy(this.gameObject);
+        Debug.Log("valve turned once and end");
+    }
+}
+
+
+//NOTE: this is the singleton script where once you pick up the pipe wrench, you can no longer pick it up between scenes. This also disables the collider on the red valve
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+//NOTE: this is a singleton script
+
+public class HavePipeWrench : MonoBehaviour
+{
+    public static  HavePipeWrench callPipeWrenchScript;
+
+    public  GameObject thePipeWrench;
+    public  GameObject theTextBeingDisplayed;
+
+    public Collider beginValveCollider;
+    public Collider valveDisabled1;
+
+    public static bool pipewrenchPickUp1 = false;
+    public bool myPipeWrenchPickUp = false;
+
+    public static bool colliderForValveDisabled = false;
+
+    void Awake()
+    {
+        pickedupPipeWrench();
+        valveDisabled();
+        //Debug.Log("Started pickupofpipewrench");
+    }
+
+    public void pickedupPipeWrench()
+    {
+        if (pipewrenchPickUp1)
+        {
+            pipewrenchPickUp1 = true;
+            myPipeWrenchPickUp = true;
+
+            Destroy(thePipeWrench.gameObject);
+            Destroy(theTextBeingDisplayed.gameObject);
+            //Debug.Log("destroyed pipe wrench pickup 1");
+        }   
+    }
+
+    public void valveDisabled()
+    {
+        if (colliderForValveDisabled)
+        {
+            colliderForValveDisabled = true;                                    //this states that the bool is set to true
+            valveDisabled1.enabled = false;                                     //this turns off the collider on Awake if bool is set to true
+            beginValveCollider.enabled = false;                                 //this turns off the initial trigger when finding the valve
+        }
+    }
+}

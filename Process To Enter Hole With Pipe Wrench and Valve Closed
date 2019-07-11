@@ -271,3 +271,34 @@ public class HavePipeWrench : MonoBehaviour
         }
     }
 }
+
+
+//NOTE: This script makes sure the hole that is to be entered is cleared if the script and bool are called ( Valve_Allowed.valveClose ) to be true
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class HoleEnter : MonoBehaviour
+{
+    public GameObject holeEnterNow;
+    public Collider holeEnterNowColliderOn;
+    public Collider holeNoEntry;
+
+    public GameObject textoffDisplay;
+
+
+    void Awake()
+    {
+        textoffDisplay.SetActive(false);
+        Debug.Log("turned off display prompt");
+
+        if (Valve_Allowed.valveClose)                                   //note: two equal signs to say if and 1 equal sign to say it does
+        {
+            holeEnterNow.SetActive(true);
+            holeEnterNowColliderOn.enabled = true;
+            holeNoEntry.enabled = false;
+
+        }
+    }
+
+}

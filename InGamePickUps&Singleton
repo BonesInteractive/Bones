@@ -1,0 +1,92 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+
+public class GamePickUpScript : MonoBehaviour
+{
+
+    public GameObject theGamePickUp;
+    public GameObject theTextDisplayBox;
+    public GameObject playerOne;
+    public GameObject playerOneAnim;
+
+    //private GameObject raycastedObj;
+
+    public Rigidbody myPlayer;
+
+    public AudioClip soundSource;
+
+    public static bool pipeWrenchTaken = false;
+
+    public Collider NewColliderToTurnValve;
+    public Collider oldColliderOnValve;
+
+    public Collider playerCollider;
+
+    private bool PKeyPressed = false;               
+
+    void Start()
+    {
+        theTextDisplayBox.SetActive(false);
+    }
+
+    void Update()
+    {
+        PKeyPressed = Input.GetKeyDown("space");
+        myPlayer.WakeUp();
+    }
+
+    void OnTriggerStay(Collider environmentCheck)
+    {
+        if (environmentCheck.gameObject.CompareTag("Player") && PKeyPressed || Input.GetKeyDown("joystick button 1")) //tag Player, space bar on keyboard and ps4 X
+        {
+            playerCollider.enabled = false;
+            Debug.Log("player collider is off");
+            StartCoroutine(NowChecking());
+        }
+    }
+
+    IEnumerator NowChecking()
+    {
+        GetComponent<AudioSource>().PlayOneShot(soundSource, 1);
+        myPlayer.isKinematic = true;
+        //myPlayer.constraints = RigidbodyConstraints.F
+        playerOneAnim.GetComponent<Animator>().Play("PickUpItemHandling");
+
+        theTextDisplayBox.SetActive(true);
+        pipeWrenchTaken = true;
+
+        yield return new WaitForSeconds(2);
+        playerCollider.enabled = true;
+        Debug.Log("player collider is on");
+        myPlayer.isKinematic = false;
+        theTextDisplayBox.SetActive(false);
+        ifpipeWrenchTaken();
+        //yield return null;
+    }
+
+    void OnTriggerExit(Collider other)
+    {
+        if (other.gameObject.CompareTag("Player"))
+        {
+            theTextDisplayBox.SetActive(false);
+        }
+    }
+
+    public void ifpipeWrenchTaken()
+    {
+        if (pipeWrenchTaken)
+        {
+            theGamePickUp.SetActive(false);
+            theTextDisplayBox.SetActive(false);
+
+            NewColliderToTurnValve.gameObject.SetActive(true);
+            oldColliderOnValve.gameObject.SetActive(false);
+
+            HavePipeWrench.pipewrenchPickUp1 = true;
+            HavePipeWrench.callPipeWrenchScript.pickedupPipeWrench();
+        }
+    }
+}
+

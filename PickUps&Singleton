@@ -1,17 +1,25 @@
+NOTE: This is specific to the pipe wrench game object. You will have to duplicate this script for other pickups in your game.
+
+
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class GamePickUpScript : MonoBehaviour
+public class GamePickUpScript_PipeWrench : MonoBehaviour
 {
 
     public GameObject theGamePickUp;
     public GameObject theTextDisplayBox;
     public GameObject playerOne;
     public GameObject playerOneAnim;
+    public GameObject itemShineRemove;
 
-    //private GameObject raycastedObj;
+    public GameObject my_script;
+    public string stopThirdPersonUserControlScript;
+
+    public GameObject my_script2;
+    public string stopThirdPersonCharacter;
 
     public Rigidbody myPlayer;
 
@@ -24,7 +32,7 @@ public class GamePickUpScript : MonoBehaviour
 
     public Collider playerCollider;
 
-    private bool PKeyPressed = false;               
+    private bool PKeyPressed = false;
 
     void Start()
     {
@@ -42,7 +50,7 @@ public class GamePickUpScript : MonoBehaviour
         if (environmentCheck.gameObject.CompareTag("Player") && PKeyPressed || Input.GetKeyDown("joystick button 1")) //tag Player, space bar on keyboard and ps4 X
         {
             playerCollider.enabled = false;
-            Debug.Log("player collider is off");
+            //Debug.Log("player collider is off");
             StartCoroutine(NowChecking());
         }
     }
@@ -50,8 +58,11 @@ public class GamePickUpScript : MonoBehaviour
     IEnumerator NowChecking()
     {
         GetComponent<AudioSource>().PlayOneShot(soundSource, 1);
+
         myPlayer.isKinematic = true;
-        //myPlayer.constraints = RigidbodyConstraints.F
+        (my_script.GetComponent(stopThirdPersonUserControlScript) as MonoBehaviour).enabled = false;
+        (my_script2.GetComponent(stopThirdPersonCharacter) as MonoBehaviour).enabled = false;
+
         playerOneAnim.GetComponent<Animator>().Play("PickUpItemHandling");
 
         theTextDisplayBox.SetActive(true);
@@ -59,8 +70,11 @@ public class GamePickUpScript : MonoBehaviour
 
         yield return new WaitForSeconds(2);
         playerCollider.enabled = true;
-        Debug.Log("player collider is on");
+        //Debug.Log("player collider is on");
         myPlayer.isKinematic = false;
+        (my_script.GetComponent(stopThirdPersonUserControlScript) as MonoBehaviour).enabled = true;
+        (my_script2.GetComponent(stopThirdPersonCharacter) as MonoBehaviour).enabled = true;
+
         theTextDisplayBox.SetActive(false);
         ifpipeWrenchTaken();
         //yield return null;
@@ -79,6 +93,7 @@ public class GamePickUpScript : MonoBehaviour
         if (pipeWrenchTaken)
         {
             theGamePickUp.SetActive(false);
+            itemShineRemove.SetActive(false);
             theTextDisplayBox.SetActive(false);
 
             NewColliderToTurnValve.gameObject.SetActive(true);
@@ -89,4 +104,7 @@ public class GamePickUpScript : MonoBehaviour
         }
     }
 }
+
+
+
 

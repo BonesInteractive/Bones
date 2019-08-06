@@ -1,0 +1,114 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
+using UnityEngine.AI;
+
+
+public class ChemicalHazard : MonoBehaviour
+{
+
+    public GameObject player1;
+    public Image currentHealthbar;
+
+    public Text ratioText;
+
+    private bool deathAnimationStarted = false;
+
+    public string levelToLoad;
+
+    static public float hitpoint = 150;                                         //with static the health bar persist through each scene, stays the same
+    static public float maxHitpoint = 150;                                      //with static the health bar persist through each scene, stays the same
+
+    public GameObject my_script;
+    public string stopThirdPersonUserControlScript;                                                     // your second script, stop this script (stop player)
+
+    public GameObject my_script2;
+    public string stopThirdPersonCharacter;
+
+    public Collider eveCollider;
+
+    public Rigidbody PlayerOne;
+
+    public AudioClip femaleDeath;
+
+    public PhysicMaterial physicMaterial;
+
+
+    private void Start()
+    {
+        UpdateHealthbar();
+
+    }
+
+    private void UpdateHealthbar()                                                                      //the most important one in this script
+    {
+        float ratio = hitpoint / maxHitpoint;
+        currentHealthbar.rectTransform.localScale = new Vector3(ratio, 1f, 1f);                         //just like that already scaled the health bar
+        ratioText.text = (ratio * 100).ToString("0") + '%';                                             //the percentage shown on screen of your health
+
+
+    }
+
+    private void TakeDamage(float damage)
+    {
+
+        hitpoint -= damage;
+
+
+        if (hitpoint < 0)
+        {
+            hitpoint = 0;  //means we are pretty much dead and will stop the code from running
+
+            GetComponent<Collider>().material = physicMaterial;
+
+            //this stops Evie from sliding around after she dies
+            eveCollider.enabled = false;
+            PlayerOne.constraints = RigidbodyConstraints.FreezeAll;
+            PlayerOne.isKinematic = true;
+
+
+            (my_script.GetComponent(stopThirdPersonUserControlScript) as MonoBehaviour).enabled = false; //stops player movement from thirdpersonusercontrol
+
+            (my_script2.GetComponent(stopThirdPersonCharacter) as MonoBehaviour).enabled = false;
+
+            if (!deathAnimationStarted)
+            {
+
+
+                GetComponent<AudioSource>().PlayOneShot(femaleDeath, 1);
+                deathAnimationStarted = true;                                                                //bool start death animation
+                player1.GetComponent<Animator>().Play("Death");
+
+                StartCoroutine(DeathAnimation1());                                                           //start wait cycle and then game over screen
+            }
+        }
+
+        UpdateHealthbar();
+    }
+
+    IEnumerator DeathAnimation1()
+    {
+
+        yield return new WaitForSeconds(5f);
+
+        SceneManager.LoadScene(levelToLoad);
+
+        yield return null;                                                                            // stops coroutine from running again
+
+    }
+
+    private void HealDamage(float heal)
+    {
+        hitpoint += heal;
+        if (hitpoint > maxHitpoint)
+            hitpoint = maxHitpoint;
+
+        UpdateHealthbar();
+
+    }
+
+
+}
+

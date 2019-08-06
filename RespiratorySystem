@@ -9,21 +9,24 @@ public class RespiratorSystem : MonoBehaviour
 
     public Collider chemicalHazard;                                             //to turn off hazard
 
-    static public float hitpoint = 150;                                         //with static the health bar persist through each scene, stays the same
-    static public float maxHitpoint = 150;
+    public GameObject respiratoryScript;
+    public string stopRespiratorySystemScript;
 
     public GameObject CartridgeBG;
     public GameObject CartridgeText;
+
     public RawImage currentCartridgeBar;
 
     static public float currentCartridgePower = 100;                            //defines our current cartridge life, this also allows the bar to stay where its at upon scene changes
     public int maximumCartridgePower = 100;                                     //defines our max cartridge life, this also allows the bar to stay where its at upon scene changes
 
-    static public float _lowDrainCartridgeSpeed = 8;                            //defines our low power drain speed
+    static public float _lowDrainCartridgeSpeed = 5;                            //This is main drain speed for cartridge bar
     static public float _highDrainCartridgeSpeed = 5.0f;                        //defines our high power speed
 
-    public AudioClip soundEquipOn;
-    public AudioClip soundTurnOff;
+    public AudioSource soundEquipOn;
+    public AudioSource soundTurnOff;
+
+    public float Counter = 0;
 
     void Start()
     {
@@ -44,11 +47,46 @@ public class RespiratorSystem : MonoBehaviour
 
         if (Input.GetKeyDown("r") || Input.GetKeyDown("joystick button 0"))
         {
-            GetComponent<AudioSource>().PlayOneShot(soundEquipOn, .6f);
+            //the code lines below allow to play different audio sounds on same key press using R. it counts on a counter.
+            if (Counter == 0)
+            {
+                soundEquipOn.Play();
+                Debug.Log("Play 1");
+                theRespirator.gameObject.SetActive(!theRespirator.gameObject.activeSelf);
+                chemicalHazard.enabled = !chemicalHazard.enabled;
+                print("Num 1");
+            }
+            if (Counter == 1)
+            {
+                soundEquipOn.Stop();
+                Debug.Log("Play 2");
+                theRespirator.gameObject.SetActive(!theRespirator.gameObject.activeSelf);
+                print("Num 2");
+                soundTurnOff.Play();
+                Debug.Log("Play 3");
+            }
+            if (Counter == 2)
+            {
+                soundTurnOff.Stop();
+                //soundEquipOn.Play();
+                Debug.Log("Play 4");
+                theRespirator.gameObject.SetActive(!theRespirator.gameObject.activeSelf);
+                print("Num 3");
+                //audio3.Play();
 
-            theRespirator.gameObject.SetActive(!theRespirator.gameObject.activeSelf);
+                //GetComponent<AudioSource>().PlayOneShot(soundEquipOn, .6f);
 
-            chemicalHazard.enabled = !chemicalHazard.enabled;
+                //theRespirator.gameObject.SetActive(!theRespirator.gameObject.activeSelf);
+
+                //chemicalHazard.enabled = !chemicalHazard.enabled;
+
+            }
+            Counter++;
+        }
+
+        if (Counter == 2)
+        {
+            Counter = 0;
         }
 
         if (currentCartridgePower > maximumCartridgePower)                          //if current battery power is greater than max power
@@ -61,6 +99,9 @@ public class RespiratorSystem : MonoBehaviour
 
             theRespirator.SetActive(false);
             chemicalHazard.enabled = true;
+            //GetComponent<AudioSource>().PlayOneShot(soundTurnOff, .6f);
+
+            (respiratoryScript.GetComponent(stopRespiratorySystemScript) as MonoBehaviour).enabled = false;
 
         }
 
@@ -68,21 +109,26 @@ public class RespiratorSystem : MonoBehaviour
         {
             currentCartridgePower -= _lowDrainCartridgeSpeed * Time.deltaTime;              //then the cartridge life drains
         }
+
+        //going to need a healing portion here when you need replace the cartridges
     }
 
-    //private void TakeDamage(float damage)
-    //{
+    private void HealDamage(float heal)                                         // this calls a script and grabs the HealDamage Message to heal.  Make sure public boolean in inspector is unchecked
+    {
+        currentCartridgePower += heal;
+        if (currentCartridgePower > maximumCartridgePower)
+            currentCartridgePower = maximumCartridgePower;
 
-    //    hitpoint -= damage;
+        UpdateCartridgeBar();
 
+    }
 
-    //    if (hitpoint < 0)
-    //    {
-    //        hitpoint = 0;  //means we should allow the hazard collider to be turned back on once the cartridge is dead
-
-    //        theRespirator.SetActive(false);
-    //        chemicalHazard.enabled = true;
-
-    //    }
-    //}
+    public void turnOffMask()
+    {
+        if (!theRespirator.gameObject.activeSelf)
+        {
+            //GetComponent<AudioSource>().PlayOneShot(soundTurnOff, .6f);
+        }
+    }
 }
+

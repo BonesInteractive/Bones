@@ -1,0 +1,88 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+
+public class RespiratorSystem : MonoBehaviour
+{
+    public GameObject theRespirator;
+
+    public Collider chemicalHazard;                                             //to turn off hazard
+
+    static public float hitpoint = 150;                                         //with static the health bar persist through each scene, stays the same
+    static public float maxHitpoint = 150;
+
+    public GameObject CartridgeBG;
+    public GameObject CartridgeText;
+    public RawImage currentCartridgeBar;
+
+    static public float currentCartridgePower = 100;                            //defines our current cartridge life, this also allows the bar to stay where its at upon scene changes
+    public int maximumCartridgePower = 100;                                     //defines our max cartridge life, this also allows the bar to stay where its at upon scene changes
+
+    static public float _lowDrainCartridgeSpeed = 8;                            //defines our low power drain speed
+    static public float _highDrainCartridgeSpeed = 5.0f;                        //defines our high power speed
+
+    public AudioClip soundEquipOn;
+    public AudioClip soundTurnOff;
+
+    void Start()
+    {
+        UpdateCartridgeBar();
+
+        theRespirator.SetActive(false);
+    }
+
+    private void UpdateCartridgeBar()
+    {
+        float ratio = currentCartridgePower / maximumCartridgePower;
+        currentCartridgeBar.rectTransform.localScale = new Vector3(ratio, 1f, 1f);
+    }
+
+    void Update()
+    {
+        UpdateCartridgeBar();
+
+        if (Input.GetKeyDown("r") || Input.GetKeyDown("joystick button 0"))
+        {
+            GetComponent<AudioSource>().PlayOneShot(soundEquipOn, .6f);
+
+            theRespirator.gameObject.SetActive(!theRespirator.gameObject.activeSelf);
+
+            chemicalHazard.enabled = !chemicalHazard.enabled;
+        }
+
+        if (currentCartridgePower > maximumCartridgePower)                          //if current battery power is greater than max power
+        {
+            currentCartridgePower = maximumCartridgePower;                          //then make current power to max power
+        }
+        if (currentCartridgePower < 0)                                            //if cur power is less than zero
+        {
+            currentCartridgePower = 0;                                            //then make current power equal to zero
+
+            theRespirator.SetActive(false);
+            chemicalHazard.enabled = true;
+
+        }
+
+        if (theRespirator.gameObject.activeSelf)                                          //when the respirator is on
+        {
+            currentCartridgePower -= _lowDrainCartridgeSpeed * Time.deltaTime;              //then the cartridge life drains
+        }
+    }
+
+    //private void TakeDamage(float damage)
+    //{
+
+    //    hitpoint -= damage;
+
+
+    //    if (hitpoint < 0)
+    //    {
+    //        hitpoint = 0;  //means we should allow the hazard collider to be turned back on once the cartridge is dead
+
+    //        theRespirator.SetActive(false);
+    //        chemicalHazard.enabled = true;
+
+    //    }
+    //}
+}

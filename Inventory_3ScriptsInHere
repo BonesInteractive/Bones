@@ -1,0 +1,284 @@
+INVENTORY SCRIPT
+
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+
+public class Inventory2019 : MonoBehaviour
+{
+    public GameObject inventory;
+
+    public Text stack;
+
+    private int allSlots;
+    private int enabledSlots;
+    private GameObject[] slot;
+
+    public GameObject playerOneAnim;
+
+    public GameObject slotHolder;
+
+    public AudioSource inventorySoundOn;
+
+    public GameObject lookInBackPackAnim;
+
+    public bool AnimSwitch;
+
+    public float Counter;
+
+    //public bool toggle;
+
+    void Start()
+    {
+        AnimSwitch = (true);
+
+        inventory.SetActive(false);
+
+
+        allSlots = 8;
+        slot = new GameObject[allSlots];
+
+        for (int i = 0; i < allSlots; i++)
+        {
+            slot[i] = slotHolder.transform.GetChild(i).gameObject;
+
+            if (slot[i].GetComponent<Slot>().item == null)                      //is going to check each components slot and see if its actually empty
+                slot[i].GetComponent<Slot>().emptySlot = true;                  //if it is then we set this boolean to true
+        }
+    }
+
+    //below you will be animating the character to kneel down and check bag and toggle the inventory screen
+    void Update()
+    {
+
+        if (Input.GetKeyDown("joystick button 3") && !AnimSwitch || Input.GetKeyDown("tab"))  //joystick button 3 is triangle on PS4 controller, tab for keyboard
+        {
+            if (Counter == 0)
+            {
+                playerOneAnim.GetComponent<Animator>().Play("KneelingDownInventory");
+
+                inventory.gameObject.SetActive(!inventory.gameObject.activeSelf);
+                inventorySoundOn.Play();
+                AnimSwitch = (true);
+            }
+        }
+
+        if (Input.GetKeyDown("joystick button 3") && AnimSwitch || Input.GetKeyDown("tab"))
+        {
+            if (Counter == 1)
+            {
+                inventory.gameObject.SetActive(!inventory.gameObject.activeSelf);
+                inventorySoundOn.Play();
+
+                playerOneAnim.GetComponent<Animator>().Play("KneelingUp");
+                AnimSwitch = (false);
+            }
+            Counter++;
+        }
+
+        if (Counter == 2)
+        {
+            Counter = 0;
+        }
+    }
+
+
+    private void OnTriggerEnter(Collider other)                                 //this is where the magic happens
+    {
+        if (other.tag == "item" && Input.GetKeyDown("space") || Input.GetKeyDown("joystick button 1"))
+        {
+            GameObject itemPickedUp = other.gameObject;
+            Item item = itemPickedUp.GetComponent<Item>();
+
+            AddItem(itemPickedUp, item.ID, item.type, item.description, item.icon);
+        }
+    }
+
+    void AddItem(GameObject itemObject, int itemID, string itemType, string itemDescription, Sprite itemIcon)
+    {
+        for (int i = 0; i < allSlots; i++)
+        {
+            if (slot[i].GetComponent<Slot>().emptySlot)
+            {
+                //add item to slot
+                itemObject.GetComponent<Item>().pickedUp = true;
+                slot[i].GetComponent<Slot>().item = itemObject;
+                slot[i].GetComponent<Slot>().icon = itemIcon;                                  //Get Access to a slot
+                slot[i].GetComponent<Slot>().type = itemType;
+                slot[i].GetComponent<Slot>().ID = itemID;
+                slot[i].GetComponent<Slot>().description = itemDescription;
+
+                itemObject.transform.parent = slot[i].transform;                //basically to move the transform into the slot 
+                itemObject.SetActive(false);
+
+                slot[i].GetComponent<Slot>().UpdateSlot();
+                slot[i].GetComponent<Slot>().emptySlot = false;
+
+                //else                                                          //this else statement lets you continue to add multiple items to your inventory
+                //{
+
+                //    continue;
+                //}
+            }
+
+            return;   //we are done looking through slots
+        }
+    }
+}
+        
+______________________
+
+ITEM SCRIPT
+
+
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class Item : MonoBehaviour
+{
+    public int ID; //number to identify what item it is
+    public string type; //what type of item this is, food, armor etc.
+    public string description;
+
+    public Sprite icon;
+
+    public bool pickedUp;
+
+    [HideInInspector]
+    public bool equipped;
+
+    [HideInInspector]
+    public GameObject tool;
+
+    [HideInInspector]
+    public GameObject weapon;
+
+    public bool playersWeapons;
+
+    [HideInInspector]
+    public GameObject weaponManager;
+
+    internal Sprite sprite;
+
+    public AudioClip PickUpSound;
+
+    public void Start()
+    {
+        weaponManager = GameObject.FindWithTag("WeaponManager");
+
+        if (!playersWeapons)                                                    //if its not playersWeapon
+        {
+            int allWeapons = weaponManager.transform.childCount;                //checks all weapons inside WeaponManager
+            for (int i = 0; i < allWeapons; i++)
+            {
+               if(weaponManager.transform.GetChild(i).gameObject.GetComponent<Item>().ID == ID)    //trying to access weapons within the weapon manager that share the same ID
+                {
+                    weapon = weaponManager.transform.GetChild(i).gameObject;
+                    print(weapon.name);
+                }
+            }
+        }
+    }
+
+    public void Update()
+    {
+        if (equipped)
+        {
+            //perform weapon acts here
+
+
+
+
+            if (Input.GetKeyDown(KeyCode.G))
+                equipped = false;
+
+            if (equipped == false)
+                this.gameObject.SetActive(false);
+        }
+    }
+
+    public void ItemUsage()
+    {
+       
+
+        if (Input.GetKeyDown("space"))
+        {
+           
+        }
+
+        //weapon item
+
+        if (type == "Weapon")                                                   //this is called from the slot script when you click on the item in the inventory
+        {
+            GetComponent<AudioSource>().PlayOneShot(PickUpSound, 1);
+            //this.gameObject.SetActive(true);
+            weapon.SetActive(true);
+            weapon.GetComponent<Item>().equipped = true;                         //this sets the boolean equipped to be true which is shown in Update
+        }
+
+        //cartridge
+        if (type == "CartridgeReplacement")
+        {
+            this.gameObject.SetActive(true);
+            tool.GetComponent<Item>().equipped = true;
+        }
+
+        //health item
+        if (type == "Health")
+        {
+            equipped = true;
+        }
+    }
+}
+
+____________________________
+
+SLOT SCRIPT
+
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.EventSystems;
+
+public class Slot : MonoBehaviour, IPointerClickHandler
+{
+
+    public bool emptySlot;
+    public Sprite icon;
+
+    public GameObject item;
+   
+    public int ID;                                                              //number to identify what item it is
+    public string type;                                                         //what type of item this is, food, armor etc.
+    public string description;
+
+    public Transform slotIconGO;
+
+    public void OnPointerClick(PointerEventData pointerEventData)               //this basically checks when ever we click on an item in the inventory
+    {
+        UseItem();
+    }
+
+    private void Start()
+    {
+        slotIconGO = transform.GetChild(0);
+    }
+
+    public void UpdateSlot()
+    {
+       slotIconGO.GetComponent<Image>().sprite = icon;
+    }
+
+    public void UseItem()
+    {
+        item.GetComponent<Item>().ItemUsage();
+    }
+}
+
+
+    
+
+

@@ -1,0 +1,23 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class theCursorScript_CursorOn : MonoBehaviour
+{
+
+    void Start()
+    {
+        Cursor.lockState = CursorLockMode.Locked;                                                    //this is for only locking the cursor to the center of screen
+        Cursor.visible = true;
+
+        StartCoroutine(CursorFree());
+        print("locked mouse cursor to center");
+    }
+
+    IEnumerator CursorFree()
+    {
+        yield return new WaitForSeconds(.1f);
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
+    }
+}

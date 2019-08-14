@@ -1,0 +1,33 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class theCursorScript : MonoBehaviour
+{
+
+    public bool CursorLockedVar;
+
+    void Start()
+    {
+        Cursor.lockState = CursorLockMode.Locked;                                                    //this is for only locking the cursor to the center of screen
+        Cursor.visible = (false);
+        CursorLockedVar = (true);
+    }
+
+    void Update()
+    {
+        if (Input.GetKeyDown("tab") && !CursorLockedVar || Input.GetKeyDown("joystick button 3"))    //joystick button 3 is triangle on PS4 controller, tab for keyboard
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = (false);       
+            CursorLockedVar = (true);
+        }
+    
+        else if (Input.GetKeyDown("joystick button 3") && CursorLockedVar || Input.GetKeyDown("tab"))
+        {
+            Cursor.lockState = CursorLockMode.None;                                                  //this is for only locking the cursor to the center of screen
+            Cursor.visible = (true);
+            CursorLockedVar = (false);
+        }
+    }
+}

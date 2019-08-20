@@ -1,0 +1,47 @@
+NOTE: I used a Slider UI for enemy health value to kill the bastard. Make sure the tags are correct and the enemy isn't hitting himself, that was the issue I was having. 
+
+
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+
+public class hittingEnemyDetect : MonoBehaviour
+{
+
+    public Slider enemyHealthBar;                       //for slider UI
+    Animator anim;
+
+    public string opponent;
+
+    //static public float hitpoint = 20;
+    //static public float maxHitpoint = 20;
+
+    //Another way is to use a Slider UI for healthbar UI
+
+    void Start()
+    {
+        anim = GetComponent<Animator>();
+    }
+
+    void OnTriggerEnter(Collider other)
+    {
+
+        if (other.gameObject.tag != opponent) return;  //return will stop running the code below
+
+        enemyHealthBar.value -= 30;                     //if enemy gets hit it will decrease by 20, at 30 three or four hits and enemy is down
+        Debug.Log("Hit");
+
+        if (enemyHealthBar.value <= 0)
+            anim.SetBool("isDead", true);
+            
+        Debug.Log("KaneebusIsDead");
+    }
+
+
+        // Update is called once per frame
+        void Update()
+        {
+
+        }
+    }

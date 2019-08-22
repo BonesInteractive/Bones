@@ -1,0 +1,35 @@
+NOTE: This script is attached the main player game object, do not put on child objects.
+
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class DamageSender : MonoBehaviour
+{
+
+    public AudioClip enemyHit;
+    public Collider theSphereCollider;
+
+    public GameObject enemyOpponent;
+
+    private void Awake()
+    {
+        //theSphereCollider.enabled = false;   //once this is off it will not turn on for some reason
+    }
+
+    private void ColliderOnHit()
+    {
+        theSphereCollider.enabled = true;
+        Debug.Log("sphere collider on");
+
+        enemyOpponent.GetComponent<Animator>().Play("enemyHitReaction");
+        GetComponent<AudioSource>().PlayOneShot(enemyHit, 1);
+
+    }
+
+    private void ColliderOffNoHit()
+    {
+        theSphereCollider.enabled = false;
+        Debug.Log("sphere collider off");
+    }
+}

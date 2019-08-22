@@ -142,12 +142,18 @@ public class Item : MonoBehaviour
     public string type; //what type of item this is, food, armor etc.
     public string description;
 
+    public GameObject thePlayer;
+
     public Sprite icon;
 
     public bool pickedUp;
 
     [HideInInspector]
-    public bool equipped;
+    public bool equippedGlassShard;
+    [HideInInspector]
+    public bool equippedKitchenKnife;
+    [HideInInspector]
+    public bool equippedIronPipe;
 
     [HideInInspector]
     public GameObject tool;
@@ -162,10 +168,16 @@ public class Item : MonoBehaviour
 
     internal Sprite sprite;
 
-    public AudioClip PickUpSound;
+    public AudioClip basicMeleeSound;
+   
+
+    private float timerForPlayerAttack = 2;
 
     public void Start()
     {
+
+        GetComponent<AudioSource>();
+
         weaponManager = GameObject.FindWithTag("WeaponManager");
 
         if (!playersWeapons)                                                    //if its not playersWeapon
@@ -173,7 +185,7 @@ public class Item : MonoBehaviour
             int allWeapons = weaponManager.transform.childCount;                //checks all weapons inside WeaponManager
             for (int i = 0; i < allWeapons; i++)
             {
-               if(weaponManager.transform.GetChild(i).gameObject.GetComponent<Item>().ID == ID)    //trying to access weapons within the weapon manager that share the same ID
+                if (weaponManager.transform.GetChild(i).gameObject.GetComponent<Item>().ID == ID)    //trying to access weapons within the weapon manager that share the same ID
                 {
                     weapon = weaponManager.transform.GetChild(i).gameObject;
                     print(weapon.name);
@@ -184,54 +196,131 @@ public class Item : MonoBehaviour
 
     public void Update()
     {
-        if (equipped)
-        {
-            //perform weapon acts here
+
+        if (timerForPlayerAttack > 2)
+
+            if (equippedGlassShard)
+            {
+
+                //perform weapon acts here
 
 
+                if (Input.GetKeyDown(KeyCode.T))
+                {
+
+                    thePlayer.GetComponent<Animator>().Play("GlassShardAttack");
+                    GetComponent<AudioSource>().PlayOneShot(basicMeleeSound, 1);
+
+                    // Reset the timer.
+                    timerForPlayerAttack = 0.0f;
+                }
 
 
-            if (Input.GetKeyDown(KeyCode.G))
-                equipped = false;
+                if (Input.GetKeyDown(KeyCode.G))                                    //to unequip weapon
+                    equippedGlassShard = false;
+                //GetComponent<AudioSource>().PlayOneShot(unequipSound, 1);
 
-            if (equipped == false)
-                this.gameObject.SetActive(false);
-        }
+                if (equippedGlassShard == false)
+                    this.gameObject.SetActive(false);
+            }
+
+
+        if (timerForPlayerAttack > 2)
+
+            if (equippedKitchenKnife)
+            {
+
+                if (Input.GetKeyDown(KeyCode.Y))
+                {
+                    thePlayer.GetComponent<Animator>().Play("KitchenKnifeStab");
+                    GetComponent<AudioSource>().PlayOneShot(basicMeleeSound, 1);
+
+                    // Reset the timer.
+                    timerForPlayerAttack = 0.0f;
+                }
+
+                if (Input.GetKeyDown(KeyCode.G))                                    //to unequip weapon
+                    equippedKitchenKnife = false;
+                //GetComponent<AudioSource>().PlayOneShot(unequipSound, 1);
+
+                if (equippedKitchenKnife == false)
+                    this.gameObject.SetActive(false);
+                //Debug.Log("Put away knife");
+            }
+
+        if (timerForPlayerAttack > 2)
+
+            if (equippedIronPipe)
+            {
+                if (Input.GetKeyDown(KeyCode.T))
+                {
+                    thePlayer.GetComponent<Animator>().Play("IronPipeHit");
+                    GetComponent<AudioSource>().PlayOneShot(basicMeleeSound, 1);
+
+                    // Reset the timer.
+                    timerForPlayerAttack = 0.0f;
+                }
+
+                if (Input.GetKeyDown(KeyCode.G))                                    //to unequip weapon
+                    equippedIronPipe = false;
+                //GetComponent<AudioSource>().PlayOneShot(unequipSound, 1);
+
+                if (equippedIronPipe == false)
+                    this.gameObject.SetActive(false);
+            }
+        timerForPlayerAttack += Time.deltaTime;
     }
 
     public void ItemUsage()
     {
-       
-
         if (Input.GetKeyDown("space"))
         {
-           
+            //allows you to press space and pick up item, you need these brackets
+      
         }
 
         //weapon item
 
-        if (type == "Weapon")                                                   //this is called from the slot script when you click on the item in the inventory
+        if (type == "GlassShard")                                                   //this is called from the slot script when you click on the item in the inventory
         {
-            GetComponent<AudioSource>().PlayOneShot(PickUpSound, 1);
+            //GetComponent<AudioSource>().PlayOneShot(PickUpSound, 1);
             //this.gameObject.SetActive(true);
             weapon.SetActive(true);
-            weapon.GetComponent<Item>().equipped = true;                         //this sets the boolean equipped to be true which is shown in Update
+            weapon.GetComponent<Item>().equippedGlassShard = true;                         //this sets the boolean equipped to be true which is shown in Update
+        }
+
+        if (type == "KitchenKnife")                                                   //this is called from the slot script when you click on the item in the inventory
+        {
+            //GetComponent<AudioSource>().PlayOneShot(PickUpSound, 1);
+            //this.gameObject.SetActive(true);
+            weapon.SetActive(true);
+            weapon.GetComponent<Item>().equippedKitchenKnife = true;                         //this sets the boolean equipped to be true which is shown in Update
+        }
+
+        if (type == "IronPipe")                                                   //this is called from the slot script when you click on the item in the inventory
+        {
+            //GetComponent<AudioSource>().PlayOneShot(PickUpSound, 1);
+            //this.gameObject.SetActive(true);
+            weapon.SetActive(true);
+            weapon.GetComponent<Item>().equippedIronPipe = true;                         //this sets the boolean equipped to be true which is shown in Update
         }
 
         //cartridge
         if (type == "CartridgeReplacement")
         {
-            this.gameObject.SetActive(true);
-            tool.GetComponent<Item>().equipped = true;
+
         }
 
         //health item
         if (type == "Health")
         {
-            equipped = true;
+
         }
     }
 }
+    
+
+
 
 ____________________________
 
@@ -245,6 +334,11 @@ using UnityEngine.EventSystems;
 
 public class Slot : MonoBehaviour, IPointerClickHandler
 {
+    private Inventory2019 inventory;
+    public int i;
+
+
+
 
     public bool emptySlot;
     public Sprite icon;
@@ -257,6 +351,8 @@ public class Slot : MonoBehaviour, IPointerClickHandler
 
     public Transform slotIconGO;
 
+    //public AudioClip soundEffect;
+
     public void OnPointerClick(PointerEventData pointerEventData)               //this basically checks when ever we click on an item in the inventory
     {
         UseItem();
@@ -265,8 +361,17 @@ public class Slot : MonoBehaviour, IPointerClickHandler
     private void Start()
     {
         slotIconGO = transform.GetChild(0);
+
+        inventory = GameObject.FindGameObjectWithTag("PlayerOpponent").GetComponent<Inventory2019>();
     }
 
+    private void Update()
+    {
+        if (transform.childCount <= 0)
+        {
+            //inventory.isFull[i] = false;
+        }
+    }
     public void UpdateSlot()
     {
        slotIconGO.GetComponent<Image>().sprite = icon;
@@ -276,7 +381,20 @@ public class Slot : MonoBehaviour, IPointerClickHandler
     {
         item.GetComponent<Item>().ItemUsage();
     }
+
+    public void DropItem()                                                      //this is the call method on a button component to drop items
+    {
+        //item.GetComponent<Item>().DroppedItem();
+     
+            foreach (Transform child in transform)                              // removes any child object inside the Slot 1 parent
+            {
+                GameObject.Destroy(child.gameObject);                           // destroys all children in the parent
+                print("Destroyed or Dropped Item");
+
+        }
+    }
 }
+
 
 
     

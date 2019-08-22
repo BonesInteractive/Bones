@@ -1,47 +1,51 @@
-NOTE: I used a Slider UI for enemy health value to kill the bastard. Make sure the tags are correct and the enemy isn't hitting himself, that was the issue I was having. 
+Note: This is the damage receiver towards an enemy. The issue I was having was that the animation events were saying no receiver because the damagesender script needed to be on the parent (Player game object) with the ANIMATION COMPONENT to work
 
 
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.AI;
 
-public class hittingEnemyDetect : MonoBehaviour
+public class DamageReceiver : MonoBehaviour
 {
+    //[Range(1.0f, 30)]
+    public  Slider enemyHealthBar;                       //for slider UI
+    //public float enemyHealth;
 
-    public Slider enemyHealthBar;                       //for slider UI
     Animator anim;
 
-    public string opponent;
+    public string opponentTag;
 
-    //static public float hitpoint = 20;
-    //static public float maxHitpoint = 20;
+    public AudioClip enemyDeathSound;
 
-    //Another way is to use a Slider UI for healthbar UI
+    public NavMeshAgent Kaneebus;
 
-    void Start()
+    public Collider enemyCapsule;
+    public BoxCollider enemyBox;
+
+
+
+    private void Awake()
     {
         anim = GetComponent<Animator>();
     }
 
-    void OnTriggerEnter(Collider other)
+    public void OnTriggerEnter(Collider other)
     {
+       
+        if (other.gameObject.tag != opponentTag) return;
 
-        if (other.gameObject.tag != opponent) return;  //return will stop running the code below
-
-        enemyHealthBar.value -= 30;                     //if enemy gets hit it will decrease by 20, at 30 three or four hits and enemy is down
-        Debug.Log("Hit");
+        enemyHealthBar.value -= 5;                                             //Main enemy health, lower it is the more health he/she has
 
         if (enemyHealthBar.value <= 0)
-            anim.SetBool("isDead", true);
-            
-        Debug.Log("KaneebusIsDead");
-    }
-
-
-        // Update is called once per frame
-        void Update()
         {
+            enemyCapsule.enabled = false;
+            enemyBox.enabled = false;
+            Kaneebus.GetComponent<NavMeshAgent>().isStopped = true;
+            GetComponent<AudioSource>().PlayOneShot(enemyDeathSound, 1);
+            anim.SetBool("isDead", true);
 
         }
     }
+}

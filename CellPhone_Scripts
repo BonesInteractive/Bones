@@ -1,0 +1,240 @@
+NOTE: This first script starts up the FindMyThings Smart Phone App
+
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class cellphone : MonoBehaviour
+{
+    public GameObject EviePlayer;
+    public Rigidbody thePlayer;
+    public GameObject cellphoneStandard;
+    public GameObject cellphoneSignal;
+    public GameObject ActualCellPhone;
+    public GameObject turnOffLoadingCanvas;
+    public GameObject cellPhoneLarge;
+    public GameObject turnONCloseButton;
+
+    public GameObject my_script;
+    public string stopThirdPersonUserControlScript;
+    public GameObject my_script2;
+    public string stopThirdPersonCharacter;
+
+    public AudioSource recollectionMusic;
+
+    private AudioManager theAM;
+    public AudioClip newTrack;
+
+    Animator m_Animator;
+    //Value from the slider, and it converts to speed level
+    float m_MySliderValue;
+
+
+    void Start()
+    {
+        theAM = FindObjectOfType<AudioManager>();
+        m_Animator = gameObject.GetComponent<Animator>();
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("PlayerOpponent"))                                 //when tagged PlayerOpponent and entering room trigger
+        {
+            turnOffLoadingCanvas.SetActive(false);
+            cellphoneStandard.SetActive(false);
+            cellphoneSignal.SetActive(true);
+        }
+    }
+
+    public void FindMyThingsApp()                                               //this will start to open the app
+    {
+
+        cellphoneSignal.SetActive(false);
+
+        recollectionMusic.GetComponent<AudioSource>().Play();
+
+        if (newTrack != null)
+            theAM.ChangeBGM(newTrack);
+
+        //Make the speed of the Animator match the Slider value
+        //m_Animator.speed = m_MySliderValue;
+
+        StartCoroutine(FreezeCellPhoneAnim());
+    }
+
+    IEnumerator FreezeCellPhoneAnim()
+    {
+        thePlayer.isKinematic = true;
+
+        (my_script.GetComponent(stopThirdPersonUserControlScript) as MonoBehaviour).enabled = false;
+        (my_script2.GetComponent(stopThirdPersonCharacter) as MonoBehaviour).enabled = false;
+
+
+        ActualCellPhone.SetActive(true);
+        EviePlayer.GetComponent<Animator>().Play("CheckCellPhone");
+        yield return new WaitForSeconds(3);
+        turnONCloseButton.SetActive(true);
+        m_Animator.speed = 0;
+
+        cellPhoneLarge.SetActive(true);
+
+        yield return null;
+    }
+   
+}
+__________________________________
+NOTE: Museum Hover Over Names of Explorers and Text Box comes up with multiple options
+
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
+
+public class Museum_HoverOverItems : MonoBehaviour
+
+{
+    public GameObject noahHoverText;
+    //public BoxCollider toStopClickSpam;
+
+    public AudioSource theClickSound;
+
+    public Button Button;
+
+    //public float fadeTime;   //to fade in/out text
+
+    //public float coolDownTime;    //need a cooldownTim
+
+    void Start()
+    {
+       
+    }
+
+    public void OpenTextHover()              //this basically checks when ever we click on an item in the inventory
+    {
+       
+        noahHoverText.SetActive(true);
+        //toStopClickSpam.enabled = false;
+        //Debug.Log(" off");
+
+        GetComponent<Button>().interactable = false;
+        Debug.Log("button disabled");
+
+        StartCoroutine(TimeToCloseHover());
+
+    }
+      
+    IEnumerator TimeToCloseHover()
+    {
+        theClickSound.Play();
+        yield return new WaitForSeconds(12);
+        GetComponent<Button>().interactable = true;
+        Debug.Log("button enabled");
+        noahHoverText.SetActive(false);
+        //toStopClickSpam.enabled = true;
+    }
+}
+
+_____________________________
+NOTE: This next script is the Multiple Choice Script
+
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+
+public class ChoiceScript : MonoBehaviour
+{
+
+    //public GameObject TextBox;
+    public GameObject Choice01;
+    public GameObject Choice02;
+
+    public GameObject NoahHoverBox;
+    public GameObject MessageBox;
+
+    public int ChoiceMade;                                                      //int means integer, a whole number
+
+    public AudioSource clickySound;
+
+    public void ChoiceOption1()
+    {
+        //TextBox.GetComponent<Text>().text "That's good stranger, looks like you made the first choice.";
+        clickySound.GetComponent<AudioSource>().Play();
+        ChoiceMade = 1;
+    }
+
+    public void ChoiceOption2()
+    {
+        //TextBox.GetComponent<Text>().text "That's good stranger, looks like you made the first choice.";
+        ChoiceMade = 2;
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        if(ChoiceMade >= 1)
+        {
+            Choice01.SetActive(false);
+            Choice02.SetActive(false);
+            NoahHoverBox.SetActive(false);
+            MessageBox.SetActive(false);
+
+        }
+    }
+}
+
+________________________
+NOTE: This closes the phone and returns you to gameplay
+
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class ClosePhone : MonoBehaviour
+{
+    public GameObject theSmartPhone;
+    public GameObject holdPhoneAgain;
+    public GameObject turnOffCloseButton;
+    public GameObject phoneInHandOff;
+
+    public AudioSource silencingPhoneMusic;
+
+    public Rigidbody thePlayer;
+
+    public GameObject EviePlayer;
+    public Animator m_Animator;
+
+    public GameObject my_scriptAgain;
+    public string stopThirdPersonUserControlScriptAgain;
+    public GameObject my_script2Again;
+    public string stopThirdPersonCharacterAgain;
+
+    public void ClosingPhone()
+    {
+        m_Animator = gameObject.GetComponent<Animator>();
+
+        StartCoroutine(ClosingPhoneTime());
+    }
+
+    IEnumerator ClosingPhoneTime()
+    {
+
+        thePlayer.isKinematic = false;
+
+        (my_scriptAgain.GetComponent(stopThirdPersonUserControlScriptAgain) as MonoBehaviour).enabled = true;
+        (my_script2Again.GetComponent(stopThirdPersonCharacterAgain) as MonoBehaviour).enabled = true;
+
+        EviePlayer.GetComponent<Animator>().Play("Grounded");
+        m_Animator.speed = 1;
+        theSmartPhone.SetActive(false);
+        turnOffCloseButton.SetActive(false);
+        silencingPhoneMusic.Stop();
+        holdPhoneAgain.SetActive(true);
+        phoneInHandOff.SetActive(false);
+        yield return new WaitForSeconds(2);
+       
+
+        yield return null;
+    }
+}

@@ -3,6 +3,7 @@ NOTE: This first script starts up the FindMyThings Smart Phone App
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class cellphone : MonoBehaviour
 {
@@ -13,7 +14,11 @@ public class cellphone : MonoBehaviour
     public GameObject ActualCellPhone;
     public GameObject turnOffLoadingCanvas;
     public GameObject cellPhoneLarge;
+
+
     public GameObject turnONCloseButton;
+    public RawImage actualCellPhoneIcon;
+    public Text actualCloseText;
 
     public GameObject my_script;
     public string stopThirdPersonUserControlScript;
@@ -21,11 +26,13 @@ public class cellphone : MonoBehaviour
     public string stopThirdPersonCharacter;
 
     public AudioSource recollectionMusic;
+    public AudioSource pocketSound;
 
     private AudioManager theAM;
     public AudioClip newTrack;
 
     Animator m_Animator;
+
     //Value from the slider, and it converts to speed level
     float m_MySliderValue;
 
@@ -44,6 +51,12 @@ public class cellphone : MonoBehaviour
             cellphoneStandard.SetActive(false);
             cellphoneSignal.SetActive(true);
         }
+
+    }
+
+    void Update()
+    {
+        
     }
 
     public void FindMyThingsApp()                                               //this will start to open the app
@@ -51,13 +64,12 @@ public class cellphone : MonoBehaviour
 
         cellphoneSignal.SetActive(false);
 
+        pocketSound.GetComponent<AudioSource>().Play();
+
         recollectionMusic.GetComponent<AudioSource>().Play();
 
         if (newTrack != null)
             theAM.ChangeBGM(newTrack);
-
-        //Make the speed of the Animator match the Slider value
-        //m_Animator.speed = m_MySliderValue;
 
         StartCoroutine(FreezeCellPhoneAnim());
     }
@@ -74,12 +86,17 @@ public class cellphone : MonoBehaviour
         EviePlayer.GetComponent<Animator>().Play("CheckCellPhone");
         yield return new WaitForSeconds(3);
         turnONCloseButton.SetActive(true);
+        actualCellPhoneIcon.enabled = true;
+        actualCloseText.enabled = true;
         m_Animator.speed = 0;
 
         cellPhoneLarge.SetActive(true);
 
         yield return null;
     }
+   
+}
+
    
 }
 __________________________________
@@ -190,6 +207,7 @@ NOTE: This closes the phone and returns you to gameplay
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class ClosePhone : MonoBehaviour
 {
@@ -198,12 +216,18 @@ public class ClosePhone : MonoBehaviour
     public GameObject turnOffCloseButton;
     public GameObject phoneInHandOff;
 
+    public RawImage actualCellPhoneIcon;
+    public Text actualCloseText;
+
     public AudioSource silencingPhoneMusic;
+    //public AudioSource pocketSound;
 
     public Rigidbody thePlayer;
 
     public GameObject EviePlayer;
     public Animator m_Animator;
+
+    public GameObject largePhonePutAway;
 
     public GameObject my_scriptAgain;
     public string stopThirdPersonUserControlScriptAgain;
@@ -219,14 +243,23 @@ public class ClosePhone : MonoBehaviour
 
     IEnumerator ClosingPhoneTime()
     {
+        actualCellPhoneIcon.enabled = false;
+        actualCloseText.enabled = false;
+
+        largePhonePutAway.GetComponent<Animator>().Play("PhoneSlideOffScreen");
 
         thePlayer.isKinematic = false;
+
+        EviePlayer.GetComponent<Animator>().Play("PutPhoneAway");
 
         (my_scriptAgain.GetComponent(stopThirdPersonUserControlScriptAgain) as MonoBehaviour).enabled = true;
         (my_script2Again.GetComponent(stopThirdPersonCharacterAgain) as MonoBehaviour).enabled = true;
 
+        yield return new WaitForSeconds(1.5f);
+
         EviePlayer.GetComponent<Animator>().Play("Grounded");
         m_Animator.speed = 1;
+
         theSmartPhone.SetActive(false);
         turnOffCloseButton.SetActive(false);
         silencingPhoneMusic.Stop();
@@ -234,7 +267,7 @@ public class ClosePhone : MonoBehaviour
         phoneInHandOff.SetActive(false);
         yield return new WaitForSeconds(2);
        
-
         yield return null;
     }
 }
+

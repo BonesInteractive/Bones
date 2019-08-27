@@ -243,7 +243,7 @@ public class basement_flashlightAllPickUps : MonoBehaviour
             float interactionRayLength = 6.0f;                                  //raycast draw line length to find pick ups
 
             Vector3 interactionRayEndpoint = forwardDirection * interactionRayLength;                         //will give you the position
-            Debug.DrawLine(playerPosition, forwardDirection, Color.red, 5);                            //this will show the debug drawline on ray length
+            Debug.DrawLine(playerPosition,  interactionRayEndpoint, Color.red, 5);                            //this will show the debug drawline on ray length
 
             bool hitFound = Physics.Raycast(interactionRay, out interactionRayHit, interactionRayLength);
 

@@ -1,0 +1,75 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+//NOTE: This is a singleton
+
+public class ArrayOfBools : MonoBehaviour
+{
+    public static ArrayOfBools callArrayOfBoolsScript;   //this is what is called from another script, in your case the flashlight toggle script
+    //public AudioClip silenceSound;
+
+    public static bool batteryPickup1;
+    public static bool batteryPickup2;
+
+    //Valuables
+    public GameObject lotteryTicketArray;
+    public GameObject theDestroyedLotteryTicket;
+    public static bool lotteryTicketPickedUp;
+
+    public static bool drainwaterOff;
+
+    internal bool mybool;
+
+    void Start()
+    {
+        callArrayOfBoolsScript = this;
+        //instance = this;
+        //someMethod();
+        //drainwaterIsOff();
+        //Debug.Log("Started someMethod");
+    }
+
+    public void SomeMethod()
+    {
+        if (batteryPickup1)
+        {
+            batteryPickup1 = true;
+            Destroy(this.gameObject);
+            Debug.Log("destroyed battery pickup 1");
+        }
+        if (batteryPickup2)
+        {
+            batteryPickup2 = true;
+            Destroy(this.gameObject);
+            Debug.Log("destroyed battery pickup 2");
+        }
+    }
+
+
+    public void CollectedLotteryTicket()     //called from flashlight toggle script, once its picked up the game object is destroyed.
+    {
+        if (lotteryTicketPickedUp)
+        {
+            if (lotteryTicketArray != null)
+            {
+                lotteryTicketPickedUp = true;
+                Destroy(theDestroyedLotteryTicket.gameObject);
+                Debug.Log("destroyed lottery ticket pickup");
+            }
+        }
+    }
+        
+    public void drainwaterIsOff()
+    {
+        if (drainwaterOff)
+        {
+            drainwaterOff = true;
+            Destroy(this.gameObject);
+            Debug.Log("destroyed drain water");
+        }
+    }
+}
+
+
+

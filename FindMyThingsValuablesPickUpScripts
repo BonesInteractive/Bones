@@ -78,52 +78,34 @@ public class Valuables : MonoBehaviour
 {
     //NOTE: this is a singleton script
 
-    public static Valuables instance = null;                             //calls the valuable script from anywhere
-
     //Lottery Ticket variables
     public GameObject theLotteryTicket;
     public Collider theLotteryTicketCollider;
     public GameObject lotteryTicketSparkleEnabled;                            //enables sparkle effect when finding an item
-
-    public static bool lotteryTicketQuest = false;
+    public static bool lotteryTicketQuest = false;                            //this calls the ticketquest bool to be false
 
     void Start()
     {
-        //instance = this;
-        //Debug.Log("instance started");
-
         lotteryTicketSparkleEnabled.GetComponent<ParticleSystem>().Stop();
-        theLotteryTicketCollider.enabled = false;
+       
     }
 
     public void EndMethod()
-
     {
-        Debug.Log("calledEndMethod");
 
         if (lotteryTicketQuest)
         {
-
             theLotteryTicketCollider.enabled = true;                            //the collider is on for lottery ticket
             theLotteryTicket.SetActive(true);                                   //the game object is turned on
             Debug.Log("lottery ticket gameobject and collider active");
 
-            //theLotteryTicket.GetComponent<basement_flashlightAllPickUps>().lotteryTicketavailable = true;
-            //Debug.Log("going to flashlight script, lottery ticket available bool set to true");
-
-            flashlightToggle.lotteryTicketavailable = true;
+            basement_flashlightAllPickUps.lotteryTicketavailable = true;
             Debug.Log("going to flashlight script, lottery ticket bool set to true");
-
-            //EndUpdate();
-            //}
         }
-
-        //public void EndUpdate()
-        //{
-        //    //do nothing
-        //}
     }
 }
+
+
 ______________________________
 
 Basement Flashlight Script is required because new stuff is in Update function
@@ -183,7 +165,8 @@ public class basement_flashlightAllPickUps : MonoBehaviour
     public GameObject theLotteryTicket;
     public GameObject lotteryTicketSparkleEnabled;
     public Collider theLotteryTicketCollider;
-    public bool lotteryTicketavailable;
+    public static bool lotteryTicketavailable;
+    public static basement_flashlightAllPickUps callBasementFlashlightToggleScript;
 
     bool soundPlayed3 = false;
 
@@ -191,21 +174,11 @@ public class basement_flashlightAllPickUps : MonoBehaviour
     {
         UpdateBatteryBar();
 
-        //batteryColliderEnable.enabled = false;
-        //batteryColliderEnable2.enabled = false;
-        //allEnable = GetComponent<Collider>();
-
-        //sparkleEnable.GetComponent<ParticleSystem>().Stop();
-        //sparkleEnable2.GetComponent<ParticleSystem>().Stop();
-
         flashlightSource2.enabled = false;
         flashlightOff.enabled = false;
-        //Debug.Log("Flashlight should be off");
-
-        //singleton.GetComponent<GlobalBattery>();
-        //GetComponent<GlobalBattery>();
 
         //Valuables
+        lotteryTicketSparkleEnabled.GetComponent<ParticleSystem>().Stop();
         lotteryTicketavailable = false;
     }
 
@@ -269,8 +242,8 @@ public class basement_flashlightAllPickUps : MonoBehaviour
             RaycastHit interactionRayHit;
             float interactionRayLength = 6.0f;                                  //raycast draw line length to find pick ups
 
-            Vector3 interactionRayEndpoint = forwardDirection * interactionRayLength;           //will give you the position
-            Debug.DrawLine(playerPosition, interactionRayEndpoint, Color.red, 5);                            //this will show the debug drawline on ray length
+            Vector3 interactionRayEndpoint = forwardDirection * interactionRayLength;                         //will give you the position
+            Debug.DrawLine(playerPosition, forwardDirection, Color.red, 5);                            //this will show the debug drawline on ray length
 
             bool hitFound = Physics.Raycast(interactionRay, out interactionRayHit, interactionRayLength);
 
@@ -281,15 +254,10 @@ public class basement_flashlightAllPickUps : MonoBehaviour
                 {
                     GetComponent<AudioSource>().PlayOneShot(foundItem, 1);
                     soundPlayed = true;
-                    //sparkleEnable.GetComponent<ParticleSystem>().Play();
-                    //batteryWeCollectCollider.SetActive(true);
 
-                    batteryAlreadyCollected = true;
+                    batteryAlreadyCollected = true;                           
 
-                    //batteryColliderEnable.enabled = true;
-
-                    ArrayOfBools.batteryPickup1 = true;
-                    //ArrayOfBools.instance.SomeMethod();
+                    ArrayOfBools.batteryPickup1 = true;            
                     theArrayofBoolsGO.GetComponent<ArrayOfBools>().SomeMethod();
 
                     GameObject hitGameObject = interactionRayHit.transform.gameObject;
@@ -311,8 +279,7 @@ public class basement_flashlightAllPickUps : MonoBehaviour
                     GetComponent<AudioSource>().PlayOneShot(foundItem, 1);
                     soundPlayed2 = true;
 
-                    ArrayOfBools.batteryPickup2 = true;
-                    //ArrayOfBools.instance.SomeMethod();
+                    ArrayOfBools.batteryPickup2 = true;       
                     theArrayofBoolsGO.GetComponent<ArrayOfBools>().SomeMethod();
 
                     GameObject hitGameObject = interactionRayHit.transform.gameObject;
@@ -324,26 +291,21 @@ public class basement_flashlightAllPickUps : MonoBehaviour
                 if (soundPlayed2) soundPlayed2 = false;
             }
 
-            if (hitFound)                                                                                                 //this works
+            if (hitFound)                                                                                                 //hitFound bool is true
                 {
-                    //Debug.Log("hit found and lotteryticket FOUND! now play rest of code damnit");
-
-                    if (lotteryTicketavailable = true && interactionRayHit.collider.gameObject.tag == "LotteryTicket")    //this works      
-                    {
-                        //Debug.Log("sound played and lotteryticket showing up");
-
+               
+                    if (lotteryTicketavailable = true && interactionRayHit.collider.gameObject.tag == "LotteryTicket")     //lotteryTicketavailable = true and interactionhit tag LotteryTicket     
+                {
+                        
                         GetComponent<AudioSource>().PlayOneShot(foundItem, 1);
                         soundPlayed3 = true;
+
                         theLotteryTicket.SetActive(true);
                         lotteryTicketSparkleEnabled.GetComponent<ParticleSystem>().Play();
                         theLotteryTicketCollider.enabled = true;
 
                         ArrayOfBools.lotteryTicketPickedUp = true;
                         ArrayOfBools.callArrayOfBoolsScript.CollectedLotteryTicket();
-                        //Debug.Log("is checking array of bools SomeMethod in script");
-
-                        //theArrayofBoolsGO.GetComponent<ArrayOfBools>().CollectedLotteryTicket();            
-                        //Debug.Log("lottery ticket collider active and ready to be picked up");
                     }
                 }
 
@@ -352,7 +314,6 @@ public class basement_flashlightAllPickUps : MonoBehaviour
 
                     if (soundPlayed3) soundPlayed3 = false;
                 }
-
             }
         }
 

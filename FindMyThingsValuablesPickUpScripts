@@ -1,0 +1,532 @@
+NOTE: These scripts are executed in order for valuable system pickups to work
+
+The Choice Script
+
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+
+public class ChoiceScript : MonoBehaviour
+{
+    //public GameObject TextBox;
+    public GameObject Choice01;
+    public GameObject Choice02;
+    public GameObject NoahHoverBox;
+    public GameObject MessageBox;
+    public GameObject Button;
+    public Collider theLotteryTicketCollider;
+    public static bool lotteryTicketGlobal = false;
+   
+    public int ChoiceMade;                                                      //int means integer, a whole number
+
+    public AudioSource clickySound;
+
+    //getting component
+    public GameObject ticket;
+    public GameObject theValuableScript;
+
+    public void ChoiceOption1()
+    {
+        //TextBox.GetComponent<Text>().text "That's good stranger, looks like you made the first choice.";
+        clickySound.GetComponent<AudioSource>().Play();
+        ChoiceMade = 1;
+
+        Option1Selected();
+    }
+
+    public void ChoiceOption2()
+    {
+        ChoiceMade = 2;
+
+        //Make something happen here
+    }
+
+    void Update()
+    {
+        if (ChoiceMade >= 1)
+        {
+            Choice01.SetActive(false);
+            Choice02.SetActive(false);
+            NoahHoverBox.SetActive(false);
+            MessageBox.SetActive(false);
+            Button.SetActive(false);
+        }
+    }
+    public void Option1Selected()
+    {
+        lotteryTicketGlobal = true;
+        theLotteryTicketCollider.enabled = true;
+        Debug.Log("lotterTicketActive");
+
+        Valuables.lotteryTicketQuest = true;
+        //Valuables.instance.EndMethod();
+        ticket.GetComponent<Valuables>().EndMethod();
+
+    }
+}
+
+_______________________________
+
+Valuables Script
+
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class Valuables : MonoBehaviour
+{
+    //NOTE: this is a singleton script
+
+    public static Valuables instance = null;                             //calls the valuable script from anywhere
+
+    //Lottery Ticket variables
+    public GameObject theLotteryTicket;
+    public Collider theLotteryTicketCollider;
+    public GameObject lotteryTicketSparkleEnabled;                            //enables sparkle effect when finding an item
+
+    public static bool lotteryTicketQuest = false;
+
+    void Start()
+    {
+        //instance = this;
+        //Debug.Log("instance started");
+
+        lotteryTicketSparkleEnabled.GetComponent<ParticleSystem>().Stop();
+        theLotteryTicketCollider.enabled = false;
+    }
+
+    public void EndMethod()
+
+    {
+        Debug.Log("calledEndMethod");
+
+        if (lotteryTicketQuest)
+        {
+
+            theLotteryTicketCollider.enabled = true;                            //the collider is on for lottery ticket
+            theLotteryTicket.SetActive(true);                                   //the game object is turned on
+            Debug.Log("lottery ticket gameobject and collider active");
+
+            //theLotteryTicket.GetComponent<basement_flashlightAllPickUps>().lotteryTicketavailable = true;
+            //Debug.Log("going to flashlight script, lottery ticket available bool set to true");
+
+            flashlightToggle.lotteryTicketavailable = true;
+            Debug.Log("going to flashlight script, lottery ticket bool set to true");
+
+            //EndUpdate();
+            //}
+        }
+
+        //public void EndUpdate()
+        //{
+        //    //do nothing
+        //}
+    }
+}
+______________________________
+
+Basement Flashlight Script is required because new stuff is in Update function
+
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+
+public class basement_flashlightAllPickUps : MonoBehaviour
+{
+    //public GameObject[] collectables;
+    //public Collider[] allEnable;
+
+    //public GameObject batteryWeCollectCollider;
+    private ArrayOfBools callScript;
+    //public GameObject batteryWeCollectCollider2;
+
+    //public GameObject sparkleEnable;                                            //enables sparkle effect when finding an item
+   //public GameObject sparkleEnable2;
+
+    public GameObject myPlayer;
+    public GameObject HeadLampToggle;
+
+    //Items that will be picked up
+    //[SerializeField]
+    //public Collider batteryColliderEnable;                                      //used to enable collider when flashlight raycast hits the item
+    //public Collider batteryColliderEnable2;
+
+    public static bool batteryAlreadyCollected = false;
+   
+    bool soundPlayed = false;
+    bool soundPlayed2 = false;
+
+    public RawImage currentBatteryBar;
+
+    public Light flashlightSource2;                                             //reference to our light
+    public Light flashlightOff;                                                 //reference our backlit when looking at the light on flashlight
+
+    static public float currentbatteryPower = 100;                                      //defines our current battery power
+    public int maximumBatteryPower = 100;                                       //defines our max battery power
+
+    static public float _lowDrainBatterySpeed = 2;                                  //defines our low power battery speed
+    static public float _highDrainBatterySpeed = 5.0f;                                 //defines our high power battery speed
+
+    public AudioClip soundTurnOn;                                               //assign audio clip
+    public AudioClip soundTurnOff;                                              //assign audio clip
+    public AudioClip batteryPickUpSound;                                        //assign audio clip
+    public AudioClip foundItem;
+
+    public float _maxFlickerSpeed = 1f;                                         //defines are max light flicker speed
+    public float _minFlickerSpeed = 0.1f;                                       //defines are min light flicker speed
+
+    //ValuablesInBasement
+    public List<string> LotteryTicket = new List<string>();
+    public GameObject theArrayofBoolsGO;
+    public GameObject theLotteryTicket;
+    public GameObject lotteryTicketSparkleEnabled;
+    public Collider theLotteryTicketCollider;
+    public bool lotteryTicketavailable;
+
+    bool soundPlayed3 = false;
+
+    void Start()
+    {
+        UpdateBatteryBar();
+
+        //batteryColliderEnable.enabled = false;
+        //batteryColliderEnable2.enabled = false;
+        //allEnable = GetComponent<Collider>();
+
+        //sparkleEnable.GetComponent<ParticleSystem>().Stop();
+        //sparkleEnable2.GetComponent<ParticleSystem>().Stop();
+
+        flashlightSource2.enabled = false;
+        flashlightOff.enabled = false;
+        //Debug.Log("Flashlight should be off");
+
+        //singleton.GetComponent<GlobalBattery>();
+        //GetComponent<GlobalBattery>();
+
+        //Valuables
+        lotteryTicketavailable = false;
+    }
+
+    private void UpdateBatteryBar()
+    {
+        float ratio = currentbatteryPower / maximumBatteryPower;
+        currentBatteryBar.rectTransform.localScale = new Vector3(ratio, 1f, 1f);
+    }
+
+    void Update()
+    {
+        UpdateBatteryBar();
+
+        if (Input.GetKeyDown("f") || Input.GetKeyDown("joystick button 0"))
+        {
+            HeadLampToggle.GetComponent<Animator>().Play("HeadLampTouch");
+            GetComponent<AudioSource>().PlayOneShot(soundTurnOn, .6f);
+            flashlightSource2.enabled = !flashlightSource2.enabled;
+            flashlightOff.enabled = !flashlightOff.enabled;
+        }
+
+        if (currentbatteryPower > maximumBatteryPower)                          //if current battery power is greater than max power
+        {
+            currentbatteryPower = maximumBatteryPower;                          //then make current power to max power
+        }
+        if (currentbatteryPower < 0)                                            //if cur power is less than zero
+        {
+            currentbatteryPower = 0;                                            //then make current power equal to zero
+            flashlightSource2.enabled = false;                                  //you guessed it, main light source turns off
+            flashlightOff.enabled = false;                                      //back light turns off
+        }
+
+
+        if (currentbatteryPower < 10)                                           //if current battery power is less than 10
+        {
+            StartCoroutine("FlashlightModifier");                               //then will start flashlight modifier function to flickering
+        }
+
+        if (currentbatteryPower > 10)                                           //if current battery power is greater than 10
+        {
+            StopCoroutine("FlashlightModifier");                                //then will stop flashlight modifier function to flickering
+        }
+
+        if (currentbatteryPower == 0)
+        {
+            StopCoroutine("FlashlightModifier");                                ////then will stop flashlight modifier function
+            flashlightSource2.enabled = false;                                  //and disables the flashlight
+            flashlightOff.enabled = false;                                      //and disables the back light
+            return;                                                             //return because 
+        }
+
+
+        if (flashlightSource2.enabled)                                          //if the flashlight is enabled
+        {
+            currentbatteryPower -= _lowDrainBatterySpeed * Time.deltaTime;      //then minus our low drain speed from our current power
+
+            Vector3 playerPosition = transform.position;
+            Vector3 forwardDirection = transform.forward;
+
+            Ray interactionRay = new Ray(playerPosition, forwardDirection);
+            RaycastHit interactionRayHit;
+            float interactionRayLength = 6.0f;                                  //raycast draw line length to find pick ups
+
+            Vector3 interactionRayEndpoint = forwardDirection * interactionRayLength;           //will give you the position
+            Debug.DrawLine(playerPosition, interactionRayEndpoint, Color.red, 5);                            //this will show the debug drawline on ray length
+
+            bool hitFound = Physics.Raycast(interactionRay, out interactionRayHit, interactionRayLength);
+
+
+            if (hitFound) //&& Input.GetKeyDown("joystick button 1") || Input.GetKeyDown("space")) //NOTE: THis is not working
+            {
+                if (!soundPlayed && interactionRayHit.collider.gameObject.tag == "batteryTAG")
+                {
+                    GetComponent<AudioSource>().PlayOneShot(foundItem, 1);
+                    soundPlayed = true;
+                    //sparkleEnable.GetComponent<ParticleSystem>().Play();
+                    //batteryWeCollectCollider.SetActive(true);
+
+                    batteryAlreadyCollected = true;
+
+                    //batteryColliderEnable.enabled = true;
+
+                    ArrayOfBools.batteryPickup1 = true;
+                    //ArrayOfBools.instance.SomeMethod();
+                    theArrayofBoolsGO.GetComponent<ArrayOfBools>().SomeMethod();
+
+                    GameObject hitGameObject = interactionRayHit.transform.gameObject;
+                }
+            }
+
+            else
+            {
+
+                if (soundPlayed) soundPlayed = false;
+
+            }
+
+            if (hitFound)
+            {
+                if (!soundPlayed2 && interactionRayHit.collider.gameObject.tag == "batteryTAG2")
+                {
+
+                    GetComponent<AudioSource>().PlayOneShot(foundItem, 1);
+                    soundPlayed2 = true;
+
+                    ArrayOfBools.batteryPickup2 = true;
+                    //ArrayOfBools.instance.SomeMethod();
+                    theArrayofBoolsGO.GetComponent<ArrayOfBools>().SomeMethod();
+
+                    GameObject hitGameObject = interactionRayHit.transform.gameObject;
+                }
+            }
+            else
+            {
+
+                if (soundPlayed2) soundPlayed2 = false;
+            }
+
+            if (hitFound)                                                                                                 //this works
+                {
+                    //Debug.Log("hit found and lotteryticket FOUND! now play rest of code damnit");
+
+                    if (lotteryTicketavailable = true && interactionRayHit.collider.gameObject.tag == "LotteryTicket")    //this works      
+                    {
+                        //Debug.Log("sound played and lotteryticket showing up");
+
+                        GetComponent<AudioSource>().PlayOneShot(foundItem, 1);
+                        soundPlayed3 = true;
+                        theLotteryTicket.SetActive(true);
+                        lotteryTicketSparkleEnabled.GetComponent<ParticleSystem>().Play();
+                        theLotteryTicketCollider.enabled = true;
+
+                        ArrayOfBools.lotteryTicketPickedUp = true;
+                        ArrayOfBools.callArrayOfBoolsScript.CollectedLotteryTicket();
+                        //Debug.Log("is checking array of bools SomeMethod in script");
+
+                        //theArrayofBoolsGO.GetComponent<ArrayOfBools>().CollectedLotteryTicket();            
+                        //Debug.Log("lottery ticket collider active and ready to be picked up");
+                    }
+                }
+
+                else
+                {
+
+                    if (soundPlayed3) soundPlayed3 = false;
+                }
+
+            }
+        }
+
+
+    IEnumerator FlashlightModifier()
+    {
+        flashlightSource2.enabled = true;                                       //enable flashlight
+        flashlightOff.enabled = true;                                           //enable flashlight
+        yield return new WaitForSeconds                                         //between
+            (Random.Range(_minFlickerSpeed, _maxFlickerSpeed));                 //the min flicker speed and max
+
+        flashlightSource2.enabled = false;                                      //disable flashlight
+        flashlightOff.enabled = false;                                          //disable flashlight
+        yield return new WaitForSeconds                                         //between
+            (Random.Range(_minFlickerSpeed, _maxFlickerSpeed));                 //the min flicker speed and max
+    }
+
+
+    public void AddBattery(int _batteryPowerAmount)
+    {
+        currentbatteryPower += _batteryPowerAmount;                             //add battery power amount to our current battery power
+
+        if(batteryPickUpSound != null)                                          //if we have a battery pick up assigned
+        {
+            GetComponent<AudioSource>().PlayOneShot(batteryPickUpSound, 1);
+
+            //GetComponent<AudioSource>().clip = batteryPickUpSound;            //then audio clip equals batteryPickUpSound
+            //GetComponent<AudioSource>().Play();                               //and play sound
+        }
+     
+    }
+
+}
+
+
+_____________________________
+
+Array Of Bool Scripts
+
+
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+//NOTE: This is a singleton
+
+public class ArrayOfBools : MonoBehaviour
+{
+    public static ArrayOfBools callArrayOfBoolsScript;   //this is what is called from another script, in your case the flashlight toggle script
+    //public AudioClip silenceSound;
+
+    public static bool batteryPickup1;
+    public static bool batteryPickup2;
+
+    //Valuables
+    public GameObject lotteryTicketArray;
+    public GameObject theDestroyedLotteryTicket;
+    public static bool lotteryTicketPickedUp;
+
+    public static bool drainwaterOff;
+
+    internal bool mybool;
+
+    void Start()
+    {
+        callArrayOfBoolsScript = this;
+        //instance = this;
+        //someMethod();
+        //drainwaterIsOff();
+        //Debug.Log("Started someMethod");
+    }
+
+    public void SomeMethod()
+    {
+        if (batteryPickup1)
+        {
+            batteryPickup1 = true;
+            Destroy(this.gameObject);
+            Debug.Log("destroyed battery pickup 1");
+        }
+        if (batteryPickup2)
+        {
+            batteryPickup2 = true;
+            Destroy(this.gameObject);
+            Debug.Log("destroyed battery pickup 2");
+        }
+    }
+
+
+    public void CollectedLotteryTicket()     //called from flashlight toggle script, once its picked up the game object is destroyed.
+    {
+        if (lotteryTicketPickedUp)
+        {
+            if (lotteryTicketArray != null)
+            {
+                lotteryTicketPickedUp = true;
+                Destroy(theDestroyedLotteryTicket.gameObject);
+                Debug.Log("destroyed lottery ticket pickup");
+            }
+        }
+    }
+        
+    public void drainwaterIsOff()
+    {
+        if (drainwaterOff)
+        {
+            drainwaterOff = true;
+            Destroy(this.gameObject);
+            Debug.Log("destroyed drain water");
+        }
+    }
+}
+
+_________________________________
+
+Valuables Pick Up Script
+
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class ValuablePickUp : MonoBehaviour
+{
+
+    private bool triggered;
+
+    public GameObject pickUpValuable;
+
+    public GameObject imageofValuable;
+
+    void Awake()
+    {
+        pickUpValuable.gameObject.SetActive(false);
+        imageofValuable.gameObject.SetActive(false);
+    }
+
+
+    private void OnTriggerEnter(Collider bat)
+    {
+        if(bat.tag == "PlayerOpponent")//&& !alreadyPickedUp)                                       //if the gameobject with the tag Player enters the collider
+        {
+
+            //put an image here if you like to see what item you picked up, graphics go here
+
+            pickUpValuable.gameObject.SetActive(true);                                              //shows text prompt
+            imageofValuable.gameObject.SetActive(true);
+
+            StartCoroutine(TriggerLabel());
+        }
+    }
+
+    IEnumerator TriggerLabel()
+    {
+        triggered = true;
+
+        yield return new WaitForSeconds(1.9f);                                                      //wait 1.9 seconds for prompt and/or graphics to close
+        pickUpValuable.gameObject.SetActive(false);                                                 //closes text prompt
+        imageofValuable.gameObject.SetActive(false);
+
+        Destroy(gameObject);                                                                        //Destroy the lottery ticket game object
+        yield return null;
+
+
+    }
+
+    void OnGUI()
+    {
+        if (triggered)                                                                              //if bool is true then below follows
+        {
+            GUI.Label(new Rect(10, 10, 5, 20), "You Found The Lottery Ticket!");                    //calls a UI label and text shown
+        }
+    }
+
+}
+
+
+

@@ -165,8 +165,10 @@ public class basement_flashlightAllPickUps : MonoBehaviour
     public GameObject theLotteryTicket;
     public GameObject lotteryTicketSparkleEnabled;
     public Collider theLotteryTicketCollider;
+    public BoxCollider separateBoxCollider;
     public static bool lotteryTicketavailable;
     public static basement_flashlightAllPickUps callBasementFlashlightToggleScript;
+
 
     bool soundPlayed3 = false;
 
@@ -180,6 +182,7 @@ public class basement_flashlightAllPickUps : MonoBehaviour
         //Valuables
         lotteryTicketSparkleEnabled.GetComponent<ParticleSystem>().Stop();
         lotteryTicketavailable = false;
+        separateBoxCollider.enabled = false;
     }
 
     private void UpdateBatteryBar()
@@ -231,36 +234,38 @@ public class basement_flashlightAllPickUps : MonoBehaviour
         }
 
 
-        if (flashlightSource2.enabled)                                          //if the flashlight is enabled
+        if (flashlightSource2.enabled)                                                                      //if the flashlight is enabled
         {
-            currentbatteryPower -= _lowDrainBatterySpeed * Time.deltaTime;      //then minus our low drain speed from our current power
+            currentbatteryPower -= _lowDrainBatterySpeed * Time.deltaTime;                                  //then minus our low drain speed from our current power
 
-            Vector3 playerPosition = transform.position;
-            Vector3 forwardDirection = transform.forward;
+            //Note: It seems its raycasting the player position which is causing it to only look at the player.
 
-            Ray interactionRay = new Ray(playerPosition, forwardDirection);
-            RaycastHit interactionRayHit;
-            float interactionRayLength = 6.0f;                                  //raycast draw line length to find pick ups
+            Vector3 origin = myPlayer.transform.position;
+            Vector3 direction = myPlayer.transform.forward;
 
-            Vector3 interactionRayEndpoint = forwardDirection * interactionRayLength;                         //will give you the position
-            Debug.DrawLine(playerPosition,  interactionRayEndpoint, Color.red, 5);                            //this will show the debug drawline on ray length
+            Ray interactionRay = new Ray (origin, direction);
+            RaycastHit hit;
+            float RayLength = 1000;                                                                         //raycast draw line length to find pick ups
 
-            bool hitFound = Physics.Raycast(interactionRay, out interactionRayHit, interactionRayLength);
+            Vector3 interactionRayEndpoint = direction * RayLength;                                         //will give you the position
+
+            bool hitFound = Physics.Raycast(interactionRay, out hit, RayLength);                            //add units after ray length
+            Debug.DrawLine(origin, interactionRayEndpoint, Color.red, 5);                                   //this will show the debug drawline on ray length
 
 
             if (hitFound) //&& Input.GetKeyDown("joystick button 1") || Input.GetKeyDown("space")) //NOTE: THis is not working
             {
-                if (!soundPlayed && interactionRayHit.collider.gameObject.tag == "batteryTAG")
+                if (!soundPlayed && hit.collider.gameObject.tag == "batteryTAG")
                 {
                     GetComponent<AudioSource>().PlayOneShot(foundItem, 1);
                     soundPlayed = true;
 
-                    batteryAlreadyCollected = true;                           
+                    batteryAlreadyCollected = true;
 
-                    ArrayOfBools.batteryPickup1 = true;            
+                    ArrayOfBools.batteryPickup1 = true;
                     theArrayofBoolsGO.GetComponent<ArrayOfBools>().SomeMethod();
 
-                    GameObject hitGameObject = interactionRayHit.transform.gameObject;
+                    GameObject hitGameObject = hit.transform.gameObject;
                 }
             }
 
@@ -273,16 +278,16 @@ public class basement_flashlightAllPickUps : MonoBehaviour
 
             if (hitFound)
             {
-                if (!soundPlayed2 && interactionRayHit.collider.gameObject.tag == "batteryTAG2")
+                if (!soundPlayed2 && hit.collider.gameObject.tag == "batteryTAG2")
                 {
 
                     GetComponent<AudioSource>().PlayOneShot(foundItem, 1);
                     soundPlayed2 = true;
 
-                    ArrayOfBools.batteryPickup2 = true;       
+                    ArrayOfBools.batteryPickup2 = true;
                     theArrayofBoolsGO.GetComponent<ArrayOfBools>().SomeMethod();
 
-                    GameObject hitGameObject = interactionRayHit.transform.gameObject;
+                    GameObject hitGameObject = hit.transform.gameObject;
                 }
             }
             else
@@ -292,30 +297,36 @@ public class basement_flashlightAllPickUps : MonoBehaviour
             }
 
             if (hitFound)                                                                                                 //hitFound bool is true
+            {
+
+                if (lotteryTicketavailable = true && hit.collider.gameObject.tag == "LotteryTicket")     //lotteryTicketavailable = true and interactionhit tag LotteryTicket     
                 {
-               
-                    if (lotteryTicketavailable = true && interactionRayHit.collider.gameObject.tag == "LotteryTicket")     //lotteryTicketavailable = true and interactionhit tag LotteryTicket     
-                {
-                        
-                        GetComponent<AudioSource>().PlayOneShot(foundItem, 1);
-                        soundPlayed3 = true;
+                    Debug.Log("hit lottery ticket collider, shiny should pop up");
 
-                        theLotteryTicket.SetActive(true);
-                        lotteryTicketSparkleEnabled.GetComponent<ParticleSystem>().Play();
-                        theLotteryTicketCollider.enabled = true;
+                  
+                    GetComponent<AudioSource>().PlayOneShot(foundItem, 1);
+                    soundPlayed3 = true;
 
-                        ArrayOfBools.lotteryTicketPickedUp = true;
-                        ArrayOfBools.callArrayOfBoolsScript.CollectedLotteryTicket();
-                    }
-                }
+                    theLotteryTicket.SetActive(true);
+                    lotteryTicketSparkleEnabled.GetComponent<ParticleSystem>().Play();
+                    Debug.Log("sparkle particle is back on, shit yes!");
+                    theLotteryTicketCollider.enabled = true;
 
-                else
-                {
 
-                    if (soundPlayed3) soundPlayed3 = false;
+                    //this is the important part, once you raycast the collider the collider on pickup turns on and the hit collider turns off
+                    separateBoxCollider.enabled = true;                                                 //this turns on the lottery ticket to grab or walk over
+                    theLotteryTicketCollider.enabled = false;                                           //remove the hit collider to reveal the pickup collider
+
                 }
             }
+
+            else
+            {
+
+                if (soundPlayed3) soundPlayed3 = false;
+            }
         }
+    }
 
 
     IEnumerator FlashlightModifier()
@@ -347,6 +358,11 @@ public class basement_flashlightAllPickUps : MonoBehaviour
     }
 
 }
+
+
+        
+
+
 
 
 _____________________________

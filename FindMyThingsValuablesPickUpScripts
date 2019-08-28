@@ -1,4 +1,4 @@
-NOTE: These scripts are executed in order for valuable system pickups to work
+NOTE: These scripts are EXECUTED IN ORDER for the valuable system pickups to work
 
 The Choice Script
 
@@ -360,14 +360,80 @@ public class basement_flashlightAllPickUps : MonoBehaviour
 }
 
 
-        
+
+_________________________________
+
+Valuables Pick Up Script
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class ValuablePickUp : MonoBehaviour
+{
+
+    private bool triggered;
+
+    public GameObject pickUpValuable;
+    public GameObject imageofValuable;
+
+    public AudioSource valuableSound;
+
+    void Awake()
+    {
+        pickUpValuable.gameObject.SetActive(false);
+        imageofValuable.gameObject.SetActive(false);
+    }
+
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if(other.tag == "PlayerOpponent")                                  //if the gameobject with the tag Player enters the collider
+        {
+            valuableSound.GetComponent<AudioSource>().Play();
+            //put an image here if you like to see what item you picked up, graphics go here
+
+            pickUpValuable.gameObject.SetActive(true);                                              //shows text prompt
+            imageofValuable.gameObject.SetActive(true);
+            Debug.Log("pickedup ticket, image showing");
+
+            StartCoroutine(TriggerLabel());
+        }
+    }
+
+    IEnumerator TriggerLabel()
+    {
+        triggered = true;
+
+        yield return new WaitForSeconds(1.9f);                                                      //wait 1.9 seconds for prompt and/or graphics to close
+        pickUpValuable.gameObject.SetActive(false);                                                 //closes text prompt
+        imageofValuable.gameObject.SetActive(false);
+
+        ArrayOfBools.lotteryTicketPickedUp = true;
+        ArrayOfBools.callArrayOfBoolsScript.CollectedLotteryTicket();
+
+        Debug.Log("arrayofbools script called and now destroying gameobject");
+        //Destroy(gameObject);                                                                        //Destroy the lottery ticket game object
+        yield return null;
+
+
+    }
+
+    void OnGUI()
+    {
+        if (triggered)                                                                              //if bool is true then below follows
+        {
+            GUI.Label(new Rect(10, 10, 5, 20), "You Found The Lottery Ticket!");                    //calls a UI label and text shown
+            Debug.Log("GUI label turned on");
+        }
+    }
+
+}
+
+____________________________
 
 
 
-
-_____________________________
-
-Array Of Bool Scripts
+Array Of Bool Scripts (This is where we destroy game objects)
 
 
 using System.Collections;
@@ -442,68 +508,5 @@ public class ArrayOfBools : MonoBehaviour
         }
     }
 }
-
-_________________________________
-
-Valuables Pick Up Script
-
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-public class ValuablePickUp : MonoBehaviour
-{
-
-    private bool triggered;
-
-    public GameObject pickUpValuable;
-
-    public GameObject imageofValuable;
-
-    void Awake()
-    {
-        pickUpValuable.gameObject.SetActive(false);
-        imageofValuable.gameObject.SetActive(false);
-    }
-
-
-    private void OnTriggerEnter(Collider bat)
-    {
-        if(bat.tag == "PlayerOpponent")//&& !alreadyPickedUp)                                       //if the gameobject with the tag Player enters the collider
-        {
-
-            //put an image here if you like to see what item you picked up, graphics go here
-
-            pickUpValuable.gameObject.SetActive(true);                                              //shows text prompt
-            imageofValuable.gameObject.SetActive(true);
-
-            StartCoroutine(TriggerLabel());
-        }
-    }
-
-    IEnumerator TriggerLabel()
-    {
-        triggered = true;
-
-        yield return new WaitForSeconds(1.9f);                                                      //wait 1.9 seconds for prompt and/or graphics to close
-        pickUpValuable.gameObject.SetActive(false);                                                 //closes text prompt
-        imageofValuable.gameObject.SetActive(false);
-
-        Destroy(gameObject);                                                                        //Destroy the lottery ticket game object
-        yield return null;
-
-
-    }
-
-    void OnGUI()
-    {
-        if (triggered)                                                                              //if bool is true then below follows
-        {
-            GUI.Label(new Rect(10, 10, 5, 20), "You Found The Lottery Ticket!");                    //calls a UI label and text shown
-        }
-    }
-
-}
-
 
 

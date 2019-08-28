@@ -296,27 +296,23 @@ public class basement_flashlightAllPickUps : MonoBehaviour
                 if (soundPlayed2) soundPlayed2 = false;
             }
 
-            if (hitFound)                                                                                                 //hitFound bool is true
-            {
-
-                if (lotteryTicketavailable = true && hit.collider.gameObject.tag == "LotteryTicket")     //lotteryTicketavailable = true and interactionhit tag LotteryTicket     
-                {
-                    Debug.Log("hit lottery ticket collider, shiny should pop up");
-
-                  
+             if (hitFound && lotteryTicketavailable)                                                                                                 //hitFound bool is true
+            {         
+                if (!soundPlayed3)                                                          
+                {          
                     GetComponent<AudioSource>().PlayOneShot(foundItem, 1);
-                    soundPlayed3 = true;
+                    soundPlayed3 = true;                                                                //this is here because you only want to play this sound once
 
                     theLotteryTicket.SetActive(true);
                     lotteryTicketSparkleEnabled.GetComponent<ParticleSystem>().Play();
                     Debug.Log("sparkle particle is back on, shit yes!");
                     theLotteryTicketCollider.enabled = true;
 
-
                     //this is the important part, once you raycast the collider the collider on pickup turns on and the hit collider turns off
                     separateBoxCollider.enabled = true;                                                 //this turns on the lottery ticket to grab or walk over
                     theLotteryTicketCollider.enabled = false;                                           //remove the hit collider to reveal the pickup collider
 
+                    GameObject hitGameObject = rayHit.transform.gameObject;
                 }
             }
 

@@ -1,0 +1,64 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
+
+public class Museum_HoverOverItems : MonoBehaviour
+
+{
+    public GameObject noahHoverText;
+    public GameObject putAwayPhoneTemporary;
+
+    public AudioSource theClickSound;
+
+    public Button Button;
+
+    public GameObject noResponse;
+    public Image NoButton;
+    public Image YesButton;
+    public Image NoahWhiteTextBox;
+    public Text helpExplorer;
+    public Text NoahFullText;
+    public Text yesText;
+    public Text noTExt;
+
+    //public float fadeTime;   //to fade in/out text
+
+    //public float coolDownTime;    //need a cooldownTim
+
+    void Start()
+    {
+       
+    }
+
+    public void OpenTextHover()                                                 //this basically checks when ever we click on an item in the inventory
+    {
+
+        putAwayPhoneTemporary.SetActive(false);
+        noahHoverText.SetActive(true);
+        NoButton.enabled = true;
+        YesButton.enabled = true;
+        NoahWhiteTextBox.enabled = true;
+        helpExplorer.enabled = true;
+        NoahFullText.enabled = true;
+        yesText.enabled = true;
+        noTExt.enabled = true;
+        GetComponent<Button>().interactable = false;
+
+        StartCoroutine(TimeToCloseHover());
+
+    }
+      
+    IEnumerator TimeToCloseHover()
+    {
+        theClickSound.Play();
+        yield return new WaitForSeconds(12);
+        putAwayPhoneTemporary.SetActive(true);
+        GetComponent<Button>().interactable = true;
+       
+        noahHoverText.SetActive(false);
+        noResponse.SetActive(false);                                            //this works now, not sure why choice script (NoahNoSelected method) coroutine wasn't running
+
+    }
+}

@@ -1,7 +1,6 @@
 NOTE: These scripts are EXECUTED IN ORDER for the valuable system pickups to work
 
 The Choice Script
-
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -10,14 +9,31 @@ using UnityEngine.UI;
 public class ChoiceScript : MonoBehaviour
 {
     //public GameObject TextBox;
+
+    public List<string> NoahToeman = new List<string>();
+    //YesAnswerVariables
     public GameObject Choice01;
     public GameObject Choice02;
-    public GameObject NoahHoverBox;
+    public GameObject HoverOverBox;
     public GameObject MessageBox;
     public GameObject Button;
+    public GameObject QuestTakenLotteryTicketText;
+    public GameObject putAwayPhoneTemporary2;
+
     public Collider theLotteryTicketCollider;
-    public static bool lotteryTicketGlobal = false;
-   
+
+    //NoAnswerVariables
+    public GameObject noResponse;
+    public Image NoButton;
+    public Image YesButton;
+    public Image WhiteTextBox;
+    public Text helpExplorer;
+    public Text NoahFullText;
+    public Text yesText;
+    public Text noTExt;
+
+    public GameObject openPhoneAgain;
+
     public int ChoiceMade;                                                      //int means integer, a whole number
 
     public AudioSource clickySound;
@@ -26,19 +42,22 @@ public class ChoiceScript : MonoBehaviour
     public GameObject ticket;
     public GameObject theValuableScript;
 
+    public List<string> Andreana = new List<string>();
+
     public void ChoiceOption1()
     {
         //TextBox.GetComponent<Text>().text "That's good stranger, looks like you made the first choice.";
         clickySound.GetComponent<AudioSource>().Play();
         ChoiceMade = 1;
 
-        Option1Selected();
+        NoahYesSelected();
     }
 
     public void ChoiceOption2()
     {
-        ChoiceMade = 2;
+        //ChoiceMade = 2;
 
+        NoahNoSelected();
         //Make something happen here
     }
 
@@ -48,23 +67,43 @@ public class ChoiceScript : MonoBehaviour
         {
             Choice01.SetActive(false);
             Choice02.SetActive(false);
-            NoahHoverBox.SetActive(false);
+            HoverOverBox.SetActive(false);
             MessageBox.SetActive(false);
             Button.SetActive(false);
         }
+
     }
-    public void Option1Selected()
+    public void NoahYesSelected()
     {
-        lotteryTicketGlobal = true;
+        QuestTakenLotteryTicketText.SetActive(true);
         theLotteryTicketCollider.enabled = true;
         Debug.Log("lotterTicketActive");
 
+        openPhoneAgain.SetActive(true);
+
         Valuables.lotteryTicketQuest = true;
-        //Valuables.instance.EndMethod();
         ticket.GetComponent<Valuables>().EndMethod();
 
     }
+
+    public void NoahNoSelected()
+    {
+        putAwayPhoneTemporary2.SetActive(false);
+        clickySound.GetComponent<AudioSource>().Play();
+    
+        noResponse.SetActive(true);
+        NoButton.enabled = false;
+        YesButton.enabled = false;
+        WhiteTextBox.enabled = false;
+        helpExplorer.enabled = false;
+        NoahFullText.enabled = false;
+        yesText.enabled = false;
+        noTExt.enabled = false;
+      
+    }
 }
+
+
 
 _______________________________
 

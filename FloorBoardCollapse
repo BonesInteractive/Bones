@@ -1,0 +1,58 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+
+public class FloorBoardCollapse : MonoBehaviour
+{
+    public GameObject thePlayer;
+    //public GameObject dustInAir;
+    public GameObject theFloorBoard;
+
+    public AudioSource ricketyFloorBoardFX;
+
+    public Rigidbody rbFloorBoard;
+
+    public GameObject my_script;
+    public string stopThirdPersonUserControlScript;
+
+    Coroutine floorBoardVersion;                                                // This allows you to turn a specific coroutine on and off instantly
+
+
+    void OnStart()
+    {
+        theFloorBoard.SetActive(true);
+        rbFloorBoard = GetComponent<Rigidbody>();
+    }
+
+    void OnTriggerEnter(Collider other)
+    {
+        if (other.tag == "PlayerOpponent")
+        {
+            floorBoardVersion = StartCoroutine(startCollapse());
+            ricketyFloorBoardFX.Play(1);
+        }
+    }
+
+    IEnumerator startCollapse()
+    {
+        yield return new WaitForSeconds(6);
+
+        rbFloorBoard.isKinematic = false;
+        //rbFloorBoard.detectCollisions = true;
+        rbFloorBoard.useGravity = true;
+
+        //theFloorBoard.SetActive(false);                                         // after 6 seconds the floor collapses or disappears
+    }
+
+        void OnTriggerExit(Collider other)
+        {
+            if (other.tag == "PlayerOpponent")
+            {
+                StopCoroutine(floorBoardVersion);
+                ricketyFloorBoardFX.Stop();
+                theFloorBoard.SetActive(true);
+            }
+        }
+    }
+

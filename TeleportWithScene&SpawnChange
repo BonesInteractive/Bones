@@ -1,0 +1,49 @@
+NOTE: This will allow you to change spawn point upon entering a new scene
+
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class Teleport_fromWomensBathroom : MonoBehaviour
+{
+
+    public float xPos;
+    public float yPos;
+    public float zPos;
+
+    public Transform teleportTarget;
+    public GameObject thePlayer;
+
+    public Camera cameraChange1On;
+    public Camera cameraChange2Off;
+
+    public Camera cameraDepthWomensBathroom;
+
+
+    void Awake()
+    {
+
+        if (LevelSwitch_fromWomensBathroom.fromWomensBathroom1)
+        {
+          
+            thePlayer.transform.position = teleportTarget.transform.position;                       //this teleports your player from invisible game object
+            thePlayer.transform.Rotate(new Vector3(xPos, yPos, zPos));                              //this changes the player direction                                                                                                 
+
+            cameraChange1On.enabled = true;
+            cameraDepthWomensBathroom.depth = Camera.main.depth + 1;
+            cameraChange2Off.enabled = false;
+            Debug.Log("teleported properly at bathroom");
+
+            StartCoroutine (turningBoolOff());
+        }
+
+        IEnumerator turningBoolOff()
+        {
+            yield return new WaitForSeconds(.1f);
+            LevelSwitch_fromWomensBathroom.fromWomensBathroom1 = false;
+            Debug.Log("fromwomensbathroombool set to false");
+        }
+    }
+}
+
+

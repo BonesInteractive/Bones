@@ -1,0 +1,57 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class bathroomdooropen : MonoBehaviour
+{
+
+    bool onlyOnce = false;
+
+    public Animator m_Animator;
+    public GameObject thePlayer;
+    //public Rigidbody thePlayerAgain;
+
+    public GameObject stopScriptTemporarily;
+    public string stopThirdPersonUserControlScript;
+
+    public GameObject theStallDoor;
+    public AudioClip bangSound;
+
+    void OnTriggerStay(Collider other)
+    {
+        if (other.gameObject.CompareTag("PlayerOpponent") && !onlyOnce)
+        {
+            if (Input.GetKeyDown("space"))
+            {
+
+                StartCoroutine(freezeAnimation());
+
+            }
+        }
+
+        IEnumerator freezeAnimation()
+        {
+            onlyOnce = true;
+
+            (stopScriptTemporarily.GetComponent(stopThirdPersonUserControlScript) as MonoBehaviour).enabled = false;
+
+            //thePlayerAgain.constraints = RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezePositionY | RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
+
+            thePlayer.GetComponent<Animator>().Play("KickInDoor");
+            yield return new WaitForSeconds(.6f);
+            GetComponent<AudioSource>().PlayOneShot(bangSound, 1);
+            GetComponent<Animator>().Play("StallDoorOpen");
+            yield return new WaitForSeconds(.5f);
+            m_Animator.speed = 0;
+
+            (stopScriptTemporarily.GetComponent(stopThirdPersonUserControlScript) as MonoBehaviour).enabled = true;
+
+            //thePlayerAgain.constraints = RigidbodyConstraints.FreezePositionY | RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
+
+            yield return null;
+        }
+    }
+}
+
+
+

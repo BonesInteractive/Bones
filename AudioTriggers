@@ -1,0 +1,22 @@
+NOTE: This is for an object that falls to the ground with a trigger attached to it
+
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class audiotrigger_soundOnlyOneTimeCrash : MonoBehaviour
+{
+
+    public AudioClip soundOrMusicTrigger;
+    public bool soundPlayedOnce;
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.tag == "ObjectCrashToGround" && soundPlayedOnce)
+        {
+            GetComponent<AudioSource>().PlayOneShot(soundOrMusicTrigger, 1);
+            soundPlayedOnce = false;
+
+        }
+    }
+}

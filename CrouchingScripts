@@ -1,0 +1,161 @@
+NOTE: This is a slight crouch under something. Upon entering trigger the animation and Lerp occur.
+
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class CrouchUnderThings : MonoBehaviour
+{
+
+    public GameObject thePlayer;
+
+    public float crouchHeight = 2;
+    public CapsuleCollider player1;
+    public BoxCollider backPack;
+    public BoxCollider turnOffTrigger;
+
+    public Vector3 right = new Vector3(1f, 0, 0); //Vector in the direction you want to move in.
+
+    bool playOnlyOnce = false;
+
+    void OnTriggerStay(Collider other)
+    {
+        if (other.gameObject.tag == "PlayerOpponent" && Input.GetKeyDown("space"))
+        {
+
+            StartCoroutine(smooth_move(right, 1f));                                     //Calling the coroutine.
+        }
+    }
+
+    IEnumerator smooth_move(Vector3 direction, float speed = 1)
+    {
+        float startime = Time.time;
+        Vector3 start_pos = transform.position;                                         //Starting position.
+        Vector3 end_pos = transform.position + direction;                               //Ending position.
+
+        while (start_pos != end_pos && ((Time.time - startime) * speed) < 1f)
+        {
+            turnOffTrigger.enabled = false;
+            //backPack.enabled = false;
+
+            player1.height = crouchHeight = 1;                                             //lower collider to crouch
+
+
+            float move = Mathf.Lerp(0, 0.11f, (Time.time - startime) * speed);               //this controls the smooth control to get under things
+
+            thePlayer.transform.position += direction * move;
+
+            thePlayer.GetComponent<Animator>().Play("CrouchCall");
+
+            //yield return new WaitForSeconds(1);
+
+            player1.height = crouchHeight = 3.24f;                                            //reset collider height
+
+
+            ContinueToTurnOnBool();
+
+            yield return null;
+        }
+    }
+
+    void ContinueToTurnOnBool()
+    {
+        StartCoroutine(startNew());
+    }
+
+    IEnumerator startNew()
+    {
+        yield return new WaitForSeconds(5);
+
+        turnOffTrigger.enabled = true;
+        Debug.Log("crouch bools back on");
+
+        yield return null;
+    }
+}
+    
+_____________
+
+NOTE: This is a low crawl script
+
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class LowerCrouchUnderThings : MonoBehaviour
+{
+
+    public GameObject thePlayer;
+
+    public float height = 3.24f;                                                    //Capsule Collider height
+
+    public CapsuleCollider player1;
+    public BoxCollider backPack;
+    public BoxCollider turnOffTrigger;
+
+    public AudioSource lowCrawlSound;
+
+    public Vector3 right = new Vector3(1f, 0, 0);                               //Vector in the direction you want to move in.
+
+    bool playOnlyOnce = false;
+
+    void OnTriggerStay(Collider other)
+    {
+        if (other.gameObject.tag == "PlayerOpponent" && Input.GetKeyDown("space"))
+        {
+
+            StartCoroutine(smooth_move(right, 1f));                                     //Calling the coroutine.
+        }
+    }
+
+    IEnumerator smooth_move(Vector3 direction, float speed = 10)
+    {
+        float startime = Time.time;
+        Vector3 start_pos = transform.position;                                         //Starting position.
+        Vector3 end_pos = transform.position + direction;                               //Ending position.
+
+        while (start_pos != end_pos && ((Time.time - startime) * speed) < 1)
+        {
+            turnOffTrigger.enabled = false;                                             //turns off trigger colliders
+          
+
+         
+            player1.height = height = 1;                                                //lower collider to crouch
+            player1.GetComponent<CapsuleCollider>().center = new Vector3(0, 1.5f, 0);      //lowers center collider to get under
+
+            thePlayer.GetComponent<Animator>().Play("CrouchingDown");
+            lowCrawlSound.Play();
+
+            yield return new WaitForSeconds(1);
+
+            float move = Mathf.Lerp(0, .11f, (Time.time - startime) * speed);          //this controls the smooth control to get under things, higher Y axis number, the faster it moves
+
+            thePlayer.transform.position += direction * move;
+
+            thePlayer.GetComponent<Animator>().Play("LowerCrouchCall");
+
+            ContinueToTurnOnBool();
+
+            yield return null;
+        }
+    }
+
+    void ContinueToTurnOnBool()
+    {
+        StartCoroutine(startNew());
+    }
+
+    IEnumerator startNew()
+    {
+        yield return new WaitForSeconds(4);
+
+        //player1.height = height = 3.24f;
+        player1.GetComponent<CapsuleCollider>().center = new Vector3(0, 2.14f, 0);
+       
+        turnOffTrigger.enabled = true;
+        Debug.Log("crouch bools back on");
+
+        yield return null;
+    }
+}
+    

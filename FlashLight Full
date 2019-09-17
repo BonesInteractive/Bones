@@ -5,10 +5,6 @@ using UnityEngine.UI;
 
 public class flashlightToggle : MonoBehaviour
 {
-    //public GameObject[] collectables;
-    //public Collider[] allEnable;
-
-    public LayerMask _valuableLayer;
 
     public List<string> StrayPickUps = new List<string>();
     public GameObject batteryWeCollectCollider;
@@ -31,15 +27,12 @@ public class flashlightToggle : MonoBehaviour
     bool soundPlayed = false;
     bool soundPlayed2 = false;
 
-    float nativeHorizontalResolution = 1920.0f;                                 //for the GUI label resolution
-    float nativeVerticalResolution = 1080.0f;                                   //for the GUI label resolution
-
     public Light flashlightSource2;                                             //reference to our light
     public Light flashlightOff;                                                 //reference our backlit when looking at the light on flashlight
 
     public RawImage currentBatteryBar;
 
-    public float currentbatteryPower = 0f;                                      //defines our current battery power
+    static public float currentbatteryPower = 100;                              //defines our current battery power, keep these at static public float to keep scenes consistent
     public int maximumBatteryPower = 100;                                       //defines our max battery power
 
     public float _lowDrainBatterySpeed = .8f;                                  //Change For Adjustments. Change in Inspector! Defines our low power battery speed
@@ -76,21 +69,12 @@ public class flashlightToggle : MonoBehaviour
 
         batteryColliderEnable.enabled = false;
         batteryColliderEnable2.enabled = false;
-        //allEnable = GetComponent<Collider>();
 
         sparkleEnable.GetComponent<ParticleSystem>().Stop();
         sparkleEnable2.GetComponent<ParticleSystem>().Stop();
 
         flashlightSource2.enabled = false;
         flashlightOff.enabled = false;
-        //Debug.Log("Flashlight should be off");
-
-        //singleton.GetComponent<GlobalBattery>();
-        //GetComponent<GlobalBattery>();
-
-        //Valuables Only
-        //lotteryTicketSparkleEnabled.GetComponent<ParticleSystem>().Stop();
-        //theLotteryTicketCollider.enabled = false;
 
     }
 
@@ -104,8 +88,6 @@ public class flashlightToggle : MonoBehaviour
     void Update()
     {
             UpdateBatteryBar();                                                  //Updating battery bar
-
-
 
                 if (Input.GetKeyDown("f") || Input.GetKeyDown("joystick button 0"))
         {
@@ -150,22 +132,27 @@ public class flashlightToggle : MonoBehaviour
         {
             currentbatteryPower -= _lowDrainBatterySpeed * Time.deltaTime;      //then minus our low drain speed from our current power
 
+            int wallLayer = LayerMask.NameToLayer("RayCastBlocker");
+            int valuableLayer =~ LayerMask.NameToLayer("Valuables");            //LayerMasks are in binary, and the =~ (~= ?) opperator inverts a binary number. You'd get the opposite, meaning hitting everything but the valuables.
+            int rayCastMask = (1 << wallLayer) | (1 << valuableLayer);
+
             Vector3 playerPosition = transform.position;
             Vector3 forwardDirection = transform.forward;
 
             Ray interactionRay = new Ray(playerPosition, forwardDirection);
             RaycastHit interactionRayHit;
-            float interactionRayLength = 3.0f;                                                  //raycast draw line length to find pick ups
+            float interactionRayLength = 50.0f;                                                     //raycast draw line length to find pick ups
 
-            Vector3 interactionRayEndpoint = forwardDirection * interactionRayLength;           //will give you the position
-            Debug.DrawLine(playerPosition, interactionRayEndpoint, Color.red, 5);                            //this will show the debug drawline on ray length
+            Vector3 interactionRayEndpoint = forwardDirection * interactionRayLength;               //will give you the position
+                                    
+            Vector3 forward = transform.TransformDirection(Vector3.forward) * 50.0f;               //this will show the debug drawline on ray length
+            Debug.DrawRay(transform.position, forward, Color.green);
 
             bool hitFound = Physics.Raycast(interactionRay, out interactionRayHit, interactionRayLength); //  1 << 20 | 1 << 17 Can also use _valuableLayer.value.  20th layer is ray cast blocker, 17th layer is Valuables.
 
-            //bool hitFoundValuable = Physics.Raycast(interactionRay, out interactionRayHit, interactionRayLength, 1 << 17);
-
-            bool hitFoundBlocker = Physics.Raycast(interactionRay, out interactionRayHit, interactionRayLength, 1 << 20);//~(1 << 17
+            //bool hitFoundBlocker = Physics.Raycast(interactionRay, out interactionRayHit, interactionRayLength, 1 << 17);//~(1 << 17
             //Debug.Log("raycasting raycast blocker layer");
+
 
             if (hitFound)
             {
@@ -230,47 +217,44 @@ public class flashlightToggle : MonoBehaviour
             }
 
 
-            if (hitFound && lotteryTicketavailable) //checks bool only once or should
+            if (hitFound && lotteryTicketavailable)  //valuableLayer == -1     Layer Does Not Exist   -1        
             {
-                if (!soundPlayed3 && interactionRayHit.collider.gameObject.tag == "LotteryTicketTAG")
-                    Debug.Log("Raycast hit lottery ticket collider");
+                if (!soundPlayed3 && interactionRayHit.collider.gameObject.tag == "LotteryTicketTAG")            
                 {
-                    lotteryTicketavailable = true;
+                    Debug.Log("Raycast hit lottery ticket collider");
+
                     GetComponent<AudioSource>().PlayOneShot(foundItem, 1);
+                    soundPlayed3 = true;
                     theLotteryTicket.SetActive(true);
                     lotteryTicketSparkleEnabled.GetComponent<ParticleSystem>().Play();
                     theLotteryTicketCollider.enabled = true;
 
                     ArrayOfBools.lotteryTicketPickedUp = true;
-
-                    lotteryTicketavailable = false;
-                            
-                    //theArrayofBoolsGO.GetComponent<ArrayOfBools>().CollectedLotteryTicket();
+                                  
+                    lotteryTicketavailable = false;                             //checks bool only once                                        
 
                     Debug.Log("lottery ticket collider active and ready to be picked up");
                 }
             }
-
-
             else
             {
                 //theLotteryTicket.SetActive(false);
 
                 if (soundPlayed3) soundPlayed3 = false;
             }
-
-            if (hitFoundBlocker)
+            if (hitFound)
             {
                 if(interactionRayHit.collider.gameObject.tag == "HideValuables")
                 {
-                    _valuableLayer = ~(1 << 17);
-                    Debug.Log("hiding valuables");
+                    //theLotteryTicket.SetActive(false);
+                   //theLotteryTicketCollider.enabled = false;
+
+                    //Debug.Log("hiding valuable");
                 }
             }
-
             else
             {
-                _valuableLayer = (1 << 17);
+                //theLotteryTicketCollider.enabled = true;
             }
         }
     }
@@ -303,6 +287,10 @@ public class flashlightToggle : MonoBehaviour
         }
     }
 }
+        
+
+
+
         
 
 

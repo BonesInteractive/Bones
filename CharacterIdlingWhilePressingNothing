@@ -1,0 +1,40 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class EvieIdle : MonoBehaviour
+{
+
+    public Animator m_Animator;
+    public int time = 0;
+
+    //Use fixed update beacuase its called every fixed framerate frame
+    void FixedUpdate()
+    {
+        if (Input.anyKeyDown) //&& this.m_Animator.GetBool("IsEvieLookAround") == true) //if any key is held down and bool is set to true
+        {
+            m_Animator.SetBool("IsEvieLookAround", false);
+        
+        }
+
+        if (!Input.anyKey) //if no other key is pressed
+        {
+            //Starts counting when no button is being pressed
+            time = time + 1;
+        }
+        else
+        {
+            // If a button is being pressed restart counter to Zero
+            time = 0;
+
+            //m_Animator.SetBool("IsEvieLookAround", false);
+        }
+
+        //Now after a certain amount of frames of nothing being pressed it will activate this if statement
+        if (time == 200)
+        {
+            m_Animator.SetBool("IsEvieLookAround", true);
+            time = 0;
+        }
+    }
+}

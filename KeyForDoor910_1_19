@@ -1,0 +1,166 @@
+//These scripts are in order but the most important detail is "turning on a GAMEOBJECT" to be able to open the door
+
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+
+public class UI_NoteCleanDoorKey : MonoBehaviour
+{
+
+    public GameObject note2;
+    public GameObject uiText2;
+    public GameObject cleanDoorText;
+
+    public static UI_NoteCleanDoorKey callNoteCleanDoorKeyScript;               // scriptable object that can be called
+    public static bool cleanDoorKeyCollected;                                   // the door key can only be collected once
+
+    public BoxCollider turnOffNote;                                             //deactivate the note trigger globally
+
+    public AudioClip paper2;                                                    //paper sound effect
+    public AudioSource itemCollectedSound;
+
+    public float time = 5; //Seconds to read the text
+
+    void Start()
+    {
+        uiText2.gameObject.SetActive(false);
+        note2.gameObject.SetActive(false);
+    }
+
+    void OnTriggerStay(Collider col)
+    {
+
+        if (col.CompareTag("PlayerOpponent") && Input.GetKeyDown("joystick button 1") || Input.GetKeyDown("space"))
+        {
+            turnOffNote.enabled = false;
+            GetComponent<AudioSource>().PlayOneShot(paper2, 1); //lightswitch sound on
+            uiText2.gameObject.SetActive(true);
+            note2.gameObject.SetActive(true);
+
+            StartCoroutine(WaitAMinute());
+        }
+    }
+
+    IEnumerator WaitAMinute()
+    {
+        yield return new WaitForSeconds(5);
+        cleanDoorText.SetActive(true);
+        yield return new WaitForSeconds(6);
+        uiText2.gameObject.SetActive(false);
+        note2.gameObject.SetActive(false);
+        cleanDoorText.SetActive(false);
+        yield return new WaitForSeconds(1);
+        //show image of key here and wait a few more seconds
+        itemCollectedSound.Play();
+
+
+        ArrayOfBools.cleanDoorKeyCollected = true;
+        ArrayOfBools.callArrayOfBoolsScript.CollectedCleaningRoomKey();
+    }
+
+
+    void OnTriggerExit(Collider col)
+    {
+        uiText2.gameObject.SetActive(false);
+        note2.gameObject.SetActive(false);
+    }
+}
+    
+
+_________
+
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class cleaningDoorOpen : MonoBehaviour
+{
+    GameObject player;
+
+    public Animator door1;
+
+    public AudioClip Creeking;
+    public AudioClip lockedSound;
+
+    private bool lockedCleaningRoom = true;
+
+    private bool openedCleaningRoom = false;
+
+    public GameObject textLockedPrompt;
+
+    public GameObject thePlayerDoorShake;
+    public GameObject theDoorIsNowAvailable;                                    //this is just turning on the gameobject to progress
+    public BoxCollider theOldDoorCollider;                                      // old door box collider that needs turned off
+
+
+    void Start()
+    {
+        textLockedPrompt.SetActive(false);
+    }
+
+    void OnTriggerStay(Collider other)
+    {
+        if (lockedCleaningRoom && Input.GetKeyDown("space") || Input.GetKeyDown("joystick button 1"))
+        {
+            thePlayerDoorShake.GetComponent<Animator>().Play("DoorShake");
+            GetComponent<AudioSource>().PlayOneShot(lockedSound, 1);
+            textLockedPrompt.SetActive(true);
+        }
+    }
+
+    void Update()
+    {
+        if (ArrayOfBools.cleanDoorKeyCollected == true)
+        {
+            theDoorIsNowAvailable.SetActive(true);  //The door is now able to be opened
+            theOldDoorCollider.enabled = false;
+  
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if(other.gameObject.CompareTag ("PlayerOpponent"))
+        {
+            textLockedPrompt.SetActive(false);
+        }
+    }
+}
+
+       
+______________________
+
+//All I'm doing here is having this gameobject set to off, once the key is collected, turn this gameobject on
+
+
+
+
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class CleaningRoomDoorOpened : MonoBehaviour
+{
+    public GameObject theDoorUnlocked;
+
+    public AudioClip DoorOpening;
+
+    void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.CompareTag("PlayerOpponent"))
+        {
+
+            theDoorUnlocked.GetComponent<Animator>().Play("doorReallyOpens");
+            this.gameObject.GetComponent<BoxCollider>().enabled = false; // turns off box collider
+
+            GetComponent<AudioSource>().PlayOneShot(DoorOpening, 1);
+        }
+    }
+}
+
+
+
+
+
+

@@ -1,0 +1,105 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+
+public class RechargeBox : MonoBehaviour
+{
+    private static bool checkObjectOnce = false;
+
+    public GameObject evielook1;
+    public GameObject Chest1;
+    public GameObject Prompt1;
+    //public GameObject sapphireKeyText;
+    public GameObject theChestCollider;
+    public CapsuleCollider objectTrigger;
+
+    public AudioClip chestOpenFX;
+    public AudioClip importantItemFX;
+
+    public GameObject my_script1;
+    public string stopPlayerScript;
+    public string playPlayerScript;
+
+    private bool stopControl;
+    private bool gainControl = false;
+
+    public int _batteryPowerAmount = 150;
+
+    void Start()
+    {
+        Prompt1.gameObject.SetActive(false);
+    }
+
+    void OnTriggerStay(Collider col)
+    {
+        if (col.tag == "PlayerOpponent" && Input.GetKeyDown("space") | Input.GetKeyDown("joystick button 1") | Input.GetKeyDown("space"))
+        {
+            if (!stopControl)
+            {
+                GetComponent<AudioSource>().PlayOneShot(chestOpenFX, 1);
+
+              
+
+                StartCoroutine(Kneeling1());
+            }
+        }
+    }
+
+    IEnumerator Kneeling1()
+    {
+        objectTrigger.enabled = false;
+        theChestCollider.gameObject.GetComponent<CapsuleCollider>().enabled = false;
+
+        (my_script1.GetComponent(stopPlayerScript) as MonoBehaviour).enabled = false;
+        evielook1.GetComponent<Animator>().Play("KneelingDown");
+        Chest1.GetComponent<Animator>().Play("rechargeBoxOpen");
+
+        yield return new WaitForSeconds(3);
+
+        Prompt1.gameObject.SetActive(true);
+
+        GetComponent<AudioSource>().PlayOneShot(importantItemFX, 1);
+
+        flashlightToggle.callflashlightToggleScript.AddBatteryLife(_batteryPowerAmount);
+
+        yield return new WaitForSeconds(2);
+
+        Prompt1.gameObject.SetActive(false);
+
+        yield return StartCoroutine(ClosingChest());
+    }
+
+    IEnumerator ClosingChest()
+    {
+        (my_script1.GetComponent(playPlayerScript) as MonoBehaviour).enabled = true;
+        theChestCollider.gameObject.GetComponent<BoxCollider>().enabled = true;
+        evielook1.GetComponent<Animator>().Play("KneelingUp");
+
+        Prompt1.gameObject.SetActive(false);                                                                // turns off text prompt
+
+        yield return new WaitForSeconds(1.2f);
+
+        Chest1.GetComponent<Animator>().Play("rechargeBoxClose");
+
+        (my_script1.GetComponent(playPlayerScript) as MonoBehaviour).enabled = true;                        //turns back on the Third Person Controls
+
+        objectTrigger.enabled = true;                                           //allows you to continue to open the chest
+
+
+    }
+
+    void Update()
+    {
+        if (checkObjectOnce)
+        {
+            //make sure there is an arrayofbools game object in hierarchy and call this as true on start so the chest cannot be opened again.
+
+
+        }
+    }
+
+}
+               
+      
+

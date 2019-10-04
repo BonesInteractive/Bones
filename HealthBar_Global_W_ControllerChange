@@ -1,0 +1,201 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
+using UnityEngine.AI;
+
+public class HealthBar : MonoBehaviour
+{
+    public GameObject player1;
+    public GameObject GlassShardPlayer;
+
+    public RuntimeAnimatorController limpingController;
+    public RuntimeAnimatorController regularController;
+
+    //public GameObject inventoryOff;
+    //public string stopInventory2019Script;
+
+    public Image currentHealthbar;
+
+    public Text ratioText;
+
+    private bool deathAnimationStarted = false;
+
+    public string levelToLoad;
+
+    static public float hitpoint = 150;                                         //with static the health bar persist through each scene, stays the same
+    static public float maxHitpoint = 150;                                      //with static the health bar persist through each scene, stays the same
+
+    public GameObject my_script;
+    public string stopThirdPersonUserControlScript;                                                     // your second script, stop this script (stop player)
+
+    public GameObject my_script2;
+    public string stopThirdPersonCharacter;
+
+   //public GameObject my_script3;
+    //public string stopEnemyControllerScript;
+
+    //public GameObject enemyK;
+    public GameObject EnemyIdle;
+    //public string stopKaneebusAttackScript;
+
+    public Collider eveCollider;
+
+    //public NavMeshAgent Kaneebus;
+
+    public Rigidbody PlayerOne;
+
+    public AudioClip femaleDeath;
+
+
+
+
+    //public PhysicMaterial physicMaterial;
+
+
+    private void Start()
+    {
+        UpdateHealthbar();
+
+        //Kaneebus.isStopped = false;
+
+    
+
+    }
+
+    private void Update()
+    {
+
+        //This starts the limping animated controller once your health is at 30%
+        if (hitpoint < 45) //30% of 150
+        {
+            this.GetComponent<Animator>().runtimeAnimatorController = limpingController as RuntimeAnimatorController;
+            //Debug.Log("getting animator limping controller as runtimecontroller");
+
+            if (limpingController == true)
+            {
+                ThirdPersonCharacter.callThirdPersonCharacterScript.StartLimpController();
+                //Debug.Log("started limping controller in third person character script");
+            }
+        }
+
+        //This starts the third person character animated controller if your health is over 30%
+        if (hitpoint > 45) //30% of 150
+        {
+            this.GetComponent<Animator>().runtimeAnimatorController = regularController as RuntimeAnimatorController;
+            //Debug.Log("getting animator regular controller as runtimecontroller");
+
+            if (limpingController == true)
+            {
+                ThirdPersonCharacter.callThirdPersonCharacterScript.StartRegularController();
+                //Debug.Log("started regular controller in third person character script");
+            }
+        }
+    }
+
+    private void UpdateHealthbar()                                                                      //the most important one in this script
+    {
+        float ratio = hitpoint / maxHitpoint;                                                           
+        currentHealthbar.rectTransform.localScale = new Vector3(ratio, 1f, 1f);                         //just like that already scaled the health bar
+        ratioText.text = (ratio * 100).ToString("0") + '%';                                             //the percentage shown on screen of your health
+     
+
+    }
+
+    private void TakeDamage(float damage)
+    {
+
+        hitpoint -= damage;
+
+
+        if (hitpoint < 0)
+        {
+            hitpoint = 0;  //means we are pretty much dead and will stop the code from running
+
+            //playerMovement.enabled = false;
+
+            //Kaneebus.gameObject.GetComponent<NavMeshAgent>.enabled = false;                       //this was the wrong way
+
+            //Kaneebus.GetComponent<NavMeshAgent>().isStopped = true;                                 //To stop navmeshagent
+
+
+            //Destroy(GetComponent<Rigidbody>());                                                     // Removes the rigidbody from the game object
+
+            //(inventoryOff.GetComponent(stopInventory2019Script) as MonoBehaviour).enabled = false;
+
+            GlassShardPlayer.SetActive(false);                              // turn off glass shard user so no spam occurs after death
+
+
+            eveCollider.enabled = false;
+            PlayerOne.constraints = RigidbodyConstraints.FreezeAll;
+            PlayerOne.isKinematic = true;
+
+            //GetComponent<Collider>().material = physicMaterial;
+
+            EnemyIdle.GetComponent<Animator>().Play("SeparateIdle");
+
+            //Kaneebus.isStopped = true;
+
+            //Kaneebus.velocity = Vector3.zero;
+
+            //(my_script3.GetComponent(stopEnemyControllerScript) as MonoBehaviour).enabled = false; //stops Enemy Controller script
+
+            (my_script.GetComponent(stopThirdPersonUserControlScript) as MonoBehaviour).enabled = false;              //stops player movement from thirdpersonusercontrol
+            (my_script2.GetComponent(stopThirdPersonCharacter) as MonoBehaviour).enabled = false;
+
+            //(enemyK.GetComponent(stopKaneebusAttackScript) as MonoBehaviour).enabled = false; //stops enemy movement
+
+            //return:                                                                               //this will stop all other code below
+
+        
+
+            if (!deathAnimationStarted)
+                {
+
+                    //need to stop Evie from sliding around, put code here to freeze rigidbody or something
+                    GetComponent<AudioSource>().PlayOneShot(femaleDeath, 1);
+                    deathAnimationStarted = true;                                                                //bool start death animation
+                    player1.GetComponent<Animator>().Play("Death");
+
+                    StartCoroutine(DeathAnimation1());                                                           //start wait cycle and then game over screen
+            }                                                                                    
+        }
+
+        UpdateHealthbar();
+    }
+
+    IEnumerator DeathAnimation1()
+    {
+
+            //PlayerOne.constraints = RigidbodyConstraints.FreezeAll;
+
+            yield return new WaitForSeconds(5f);
+
+            SceneManager.LoadScene(levelToLoad);
+
+            yield return null;                                                                            // stops coroutine from running again
+
+    }
+
+    private void HealDamage(float heal)
+    {
+        hitpoint += heal;
+        if (hitpoint > maxHitpoint)
+            hitpoint = maxHitpoint;
+
+        UpdateHealthbar();
+
+    }
+
+    private void Recharging(float recharging)
+    {
+        hitpoint += recharging;
+        if (hitpoint > maxHitpoint)
+            hitpoint = maxHitpoint;
+
+        UpdateHealthbar();
+    }
+
+
+}

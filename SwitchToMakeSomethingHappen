@@ -1,0 +1,76 @@
+NOTE: This just turns on a switch and activates steam coming out of a pipe 
+
+
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class GateSwitch : MonoBehaviour
+{
+    public GameObject switchButtonText;
+    public GameObject steamPipe;
+
+    public GameObject flashingRedLight1;
+
+    public AudioClip gateSwitchSound;
+
+    private bool pressedSwitch1;
+
+    void Start()
+    {
+        switchButtonText.SetActive(false);
+        flashingRedLight1.SetActive(false);
+    }
+
+    void OnTriggerStay(Collider switchCollider1)
+    {
+
+        if (switchCollider1.tag == "Player" && Input.GetKeyDown("space") | Input.GetKeyDown("joystick button 1"))
+        {
+            switchButtonText.SetActive(true);
+
+            gameObject.GetComponent<AudioSource>().Play();
+
+            this.gameObject.GetComponent<BoxCollider>().enabled = false;
+
+
+            StartCoroutine(blowPipe());
+        }
+
+    }
+
+    IEnumerator blowPipe()
+    {
+        //if you want to add a character animation hitting switch or opening door, put code work here
+        //playerOne1.GetComponent<Animator>().Play("DoorHandling");
+
+        yield return new WaitForSeconds(4f);
+
+        steamPipe.SetActive(true);
+
+        flashingRedLight1.SetActive(true);
+
+        switchButtonText.gameObject.SetActive(false);
+
+        LeaveSteamOn();
+
+        //yield return null;
+
+    }
+
+    void OnTriggerExit(Collider other)
+    {
+        if (other.gameObject.tag == "Player")
+        {
+            switchButtonText.SetActive(false);
+
+        }
+    }
+
+    public void LeaveSteamOn()
+    {
+        //Do Nothing or code here
+
+    }
+}
+

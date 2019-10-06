@@ -1,0 +1,20 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.EventSystems;// Required when using Event data.
+
+public class CartridgeInfo : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler   // required interface when using the OnPointerEnter method.
+{
+    public GameObject CartridgeInfoText;
+
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        CartridgeInfoText.SetActive(true);
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        CartridgeInfoText.SetActive(false);
+    }
+}

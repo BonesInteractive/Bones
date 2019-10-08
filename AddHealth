@@ -1,0 +1,41 @@
+    NOTE: This method is called in a button component in the inspector of a panel gameobject. The number is set to 30 so you will get
+    percent health back without going over your max hit points.
+    
+    public void HealSnackBar(float healSnackBar)                                //this item heals you, called from button      
+    {
+        //add health
+        hitpoint = Mathf.Min(hitpoint + healSnackBar, maxHitpoint); 
+                                        
+        UpdateHealthbar();
+
+        if (Counter == 0)
+        {
+            useIconSound.GetComponent<AudioSource>().Play(1);
+            stackX2.gameObject.SetActive(false);
+            theSlotPanel1.gameObject.SetActive(false);
+            stackX1.gameObject.SetActive(true);
+            //print("Counter 1 hit");
+        }
+
+        if (Counter == 1)
+        {
+            stackX2.gameObject.SetActive(false);
+            theSlotPanel1.gameObject.SetActive(false);
+            stackX1.gameObject.SetActive(true);
+
+           //print("Counter 2 hit");
+        }
+
+        if (Counter == 2)
+        {
+            theSlotPanel1.gameObject.SetActive(false);
+            //then do nothing
+            //print("Counter 3 hit");
+        }
+        Counter++;
+        if (Counter == 2)
+        {
+            //Do Nothing
+            //Counter = 0;
+        }
+    }

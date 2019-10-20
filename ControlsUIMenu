@@ -1,0 +1,47 @@
+NOTE: Once the coroutine loop starts and ends, a space bar prompt appears. once it appears you are able to hit space bar and go to next scene.
+
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+
+public class ControlsMenu_Wait : MonoBehaviour
+{
+    public int sceneSelect;
+
+    public GameObject fadeToBlack;
+    public GameObject spacebarText;
+
+    void Start()
+    {
+        fadeToBlack.SetActive(false);
+        spacebarText.SetActive(false);
+
+        StartCoroutine(ControlMenuWait());
+    }
+
+    IEnumerator ControlMenuWait()
+    {
+        yield return new WaitForSeconds(10);
+
+        CallSpaceBar();
+    }
+
+    public void CallSpaceBar()
+    {
+        spacebarText.SetActive(true);
+
+        if (Input.GetKeyDown("space"))
+            Debug.Log("hit spacebar");
+        {
+            StartCoroutine(EndControlMenuScene());
+        }
+    }
+
+    IEnumerator EndControlMenuScene()
+    {
+        yield return new WaitForSeconds(.5f);
+        fadeToBlack.SetActive(true);
+        SceneManager.LoadScene(sceneSelect, LoadSceneMode.Single);
+    }
+}
